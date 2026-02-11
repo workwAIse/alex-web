@@ -51,7 +51,7 @@ The homepage includes four product-themed sections (placeholders for real conten
 | Section   | Product | Label    | Future content  |
 | --------- | ------- | -------- | --------------- |
 | `#projects` | OpenAI  | Projects | Work experience |
-| `#skills`   | Claude  | Skills   | My skills       |
+| `#skills`   | Claude  | Skills   | My skills (with logo marquee at bottom) |
 | `#code`     | Cursor  | Code     | Hobby projects  |
 | `#gems`     | Gemini  | Gems     | Private stuff   |
 
@@ -94,7 +94,21 @@ Reusable UI primitives live in **`src/components/ui/`**. This folder follows the
 
 - **`src/components/ui/fluid-menu.tsx`** – Fluid vertical menu: `Menu` (dropdown), `MenuItem`, and `MenuContainer` (expandable stack with optional `expandDirection="up"`). Used by `FluidMenuNav`.
 - **`src/components/ui/circle-menu.tsx`** – Animated circular FAB menu (Framer Motion). Used by `CircleMenuNav`; the nav is not currently rendered in the root layout.
+- **`src/components/ui/marquee.tsx`** – Horizontal marquee (infinite scroll). Used by `MarqueeDemo` at the bottom of the Skills (Claude) section for a logo strip; supports `direction`, `speed`, and `pauseOnHover`. Custom animation is defined in `globals.css` (`@theme`).
+- **`src/components/ui/marquee-demo.tsx`** – Renders the Skills section logo strip via [Logo.dev](https://logo.dev) (logos only). Edit **`MARQUEE_COMPANIES`** to change entries; use `domain` for Logo.dev or `logoSrc` for local assets (e.g. Claude, Gemini use section cursor icons). Set **`NEXT_PUBLIC_LOGO_DEV_PUBLISHABLE_KEY`** in `.env.local` for Logo.dev logos.
 - **`src/lib/utils.ts`** – `cn()` helper for merging Tailwind classes (used by UI components).
+
+### Marquee logos (Logo.dev)
+
+The Skills section marquee shows company logos and names. To enable logos (otherwise only names are shown):
+
+1. Copy `.env.example` to `.env.local`.
+2. In [Logo.dev Dashboard → API Keys](https://logo.dev/dashboard/api-keys), copy your **publishable key** (starts with `pk_`).
+3. Set `NEXT_PUBLIC_LOGO_DEV_PUBLISHABLE_KEY=pk_...` in `.env.local` and restart the dev server.
+
+To change which companies appear, edit **`MARQUEE_COMPANIES`** in `src/components/ui/marquee-demo.tsx` (each entry: `{ name: "…", domain: "company.com" }` or `{ name: "…", logoSrc: "/local-icon.webp" }` for local assets).
+
+**Attribution (production):** Logo.dev’s free tier requires an attribution link wherever logos are shown. The app already adds “Logos provided by Logo.dev” (linking to https://logo.dev) below the marquee when the API key is set. Requirements: the link must be on your **production** site, **publicly accessible**, and **must not use `rel="noreferrer"`** (referrer must pass). Paid plans remove this requirement. See [Logo.dev attribution](https://www.logo.dev/docs/platform/attribution).
 
 ## Tech stack
 
