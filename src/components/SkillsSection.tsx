@@ -1,5 +1,7 @@
 "use client";
 
+import { MarqueeDemo } from "@/components/ui/marquee-demo";
+
 /**
  * Skills section — Claude (Anthropic) brand.
  * Uses official Anthropic colors and typography: Poppins headings, Lora body,
@@ -146,6 +148,32 @@ export default function SkillsSection() {
           Claude-style section. Update categories and skills with your real data.
         </p>
       </div>
+
+      {/* Logo marquee at bottom of section */}
+      <MarqueeDemo />
+      {/* Logo.dev free tier: attribution required in production (public, followable). Do not add rel="noreferrer". Align with marquee strip (max-w-[90vw] mx-auto). */}
+      {typeof process !== "undefined" &&
+        process.env.NEXT_PUBLIC_LOGO_DEV_PUBLISHABLE_KEY?.trim() && (
+          <div className="max-w-[90vw] mx-auto mt-4">
+            <p
+              className="text-right text-2xl"
+              style={{
+                color: "#b0aea5",
+                fontFamily: "var(--font-caveat), cursive",
+              }}
+            >
+              🙏 to{" "}
+              <a
+                href="https://logo.dev"
+                title="Logo API"
+                className="underline-offset-2 hover:underline"
+                style={{ color: "#2563eb" }}
+              >
+                logo.dev
+              </a>
+            </p>
+          </div>
+        )}
     </section>
   );
 }
