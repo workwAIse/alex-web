@@ -1,36 +1,106 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# alex-web
 
-## Getting Started
+A modern personal portfolio site built with Next.js, TypeScript, and Tailwind CSS. The hero section embeds an interactive WebGL scene from [Unicorn Studio](https://unicorn.studio/).
 
-First, run the development server:
+## Getting started
+
+Install dependencies and run the development server:
 
 ```bash
+npm install
 npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+Open [http://localhost:3000](http://localhost:3000) in your browser.
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+## Build and deploy
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+Build for production:
 
-## Learn More
+```bash
+npm run build
+npm start
+```
 
-To learn more about Next.js, take a look at the following resources:
+Deploy to [Vercel](https://vercel.com): connect your repo to Vercel or use the [Vercel CLI](https://vercel.com/docs/cli). The app is a standard Next.js App Router project and requires no extra configuration.
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+## Scripts
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
+- `npm run dev` – start the development server
+- `npm run build` – build for production
+- `npm start` – start the production server
+- `npm run lint` – run ESLint
+- `npm run test` – run tests once (Vitest)
+- `npm run test:watch` – run tests in watch mode
 
-## Deploy on Vercel
+## Hero and Unicorn Studio
 
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
+The hero section uses a WebGL scene from **Unicorn Studio**:
 
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+- **Project ID:** `i9BQoAQqkzcqJPHn60gG`
+- **SDK version:** 2.0.5 (loaded via custom `sdkUrl`)
+
+The scene is rendered with the [unicornstudio-react](https://www.npmjs.com/package/unicornstudio-react) Next.js integration (`unicornstudio-react/next`), with lazy loading and production CDN enabled.
+
+For embed options and docs, see [Unicorn Studio – Embed](https://www.unicorn.studio/docs/embed/).
+
+## Sections
+
+The homepage includes four product-themed sections (placeholders for real content):
+
+| Section   | Product | Label    | Future content  |
+| --------- | ------- | -------- | --------------- |
+| `#projects` | OpenAI  | Projects | Work experience |
+| `#skills`   | Claude  | Skills   | My skills       |
+| `#code`     | Cursor  | Code     | Hobby projects  |
+| `#gems`     | Gemini  | Gems     | Private stuff   |
+
+Each section uses brand-aligned colors, typography, and layout. Add your real copy and data in the corresponding components when ready.
+
+### Sticky footer reveal
+
+The end of the page uses a **sticky footer reveal** (inspired by [Dataleap.ai](https://dataleap.ai)): the main content has large rounded bottom corners and a subtle shadow. As you scroll past the last section, the footer (fixed behind the content) is revealed, as if the page lifts away. Implemented with:
+
+- **`StickyFooterReveal`** (`src/components/StickyFooterReveal.tsx`) – Wraps the whole page: main content in a rounded wrapper (`z-10`), a spacer (`min-height: 60vh`) for scroll room, and a **fixed** footer (`z-0`) at the bottom. No JavaScript; layout is responsive using `vh` and `clamp()` for corner radius.
+- **`Footer`** (`src/components/Footer.tsx`) – Footer content (links, copyright). Theming uses CSS variables `--footer-bg` and `--footer-fg` in `globals.css`; corner radius is `--footer-reveal-radius` (default `clamp(1.5rem, 5vw, 3rem)`). Tweak these in `globals.css` to change the look.
+
+### Section-aware custom cursor
+
+When the pointer is over one of the four sections, the mouse cursor is replaced by that section’s logo. When hovering over the **AI logo** (fluid menu trigger in the bottom-right), the cursor becomes the AI Searching Lottie animation. Icons and assets live in `public/` and are mapped as follows:
+
+| Area        | Asset / behaviour                          |
+| ----------- | ------------------------------------------ |
+| `#projects` | `openai-icon.webp`                         |
+| `#skills`   | `claude-ai-icon.webp`                       |
+| `#code`     | `cursor-icon.png`                          |
+| `#gems`     | `google-gemini-icon.webp`                  |
+| AI logo     | `AI Searching.json` (Lottie cursor)        |
+
+The custom cursor is disabled when the user prefers reduced motion or has a coarse pointer (e.g. touch). Outside the four sections and the AI logo (e.g. in the hero), the default cursor is shown.
+
+## Navigation
+
+The site uses a **fluid corner menu** in the bottom-right:
+
+- **`FluidMenuNav`** (`src/components/FluidMenuNav.tsx`) – Fixed at bottom-right (`bottom-4 right-4`). The trigger is the **AI logo** (Lottie from `public/AI logo Foriday.json`). Tapping it expands the menu **upward** with nav items (Home, Projects, Skills, Code, Gems, About, Contact). Item clicks smooth-scroll to the corresponding section. Built with **`fluid-menu`** UI primitives.
+
+- **`src/components/ui/fluid-menu.tsx`** – `Menu`, `MenuItem`, and `MenuContainer`. `MenuContainer` supports `expandDirection: "up" | "down"` so the stack opens above the trigger (for corner placement) or below.
+
+The previous non-interactive **`AILogoCorner`** and the alternate **`CircleMenuNav`** (circle-menu) are still in the codebase; the root layout currently renders **`FluidMenuNav`** only.
+
+## UI components (shadcn-style)
+
+Reusable UI primitives live in **`src/components/ui/`**. This folder follows the [shadcn/ui](https://ui.shadcn.com/) convention: keeping it separate from feature components (`src/components/`) makes it clear which components are generic building blocks vs. page-specific sections, and keeps the path consistent if you later add more shadcn components via the CLI.
+
+- **`src/components/ui/fluid-menu.tsx`** – Fluid vertical menu: `Menu` (dropdown), `MenuItem`, and `MenuContainer` (expandable stack with optional `expandDirection="up"`). Used by `FluidMenuNav`.
+- **`src/components/ui/circle-menu.tsx`** – Animated circular FAB menu (Framer Motion). Used by `CircleMenuNav`; the nav is not currently rendered in the root layout.
+- **`src/lib/utils.ts`** – `cn()` helper for merging Tailwind classes (used by UI components).
+
+## Tech stack
+
+- [Next.js](https://nextjs.org/) (App Router)
+- [TypeScript](https://www.typescriptlang.org/)
+- [Tailwind CSS](https://tailwindcss.com/)
+- [Unicorn Studio](https://unicorn.studio/) (WebGL hero scene)
+- [Framer Motion](https://www.framer.com/motion/) + [lucide-react](https://lucide.dev/) (CircleMenu)
+- [Vitest](https://vitest.dev/) + [React Testing Library](https://testing-library.com/react) for tests
