@@ -17,7 +17,7 @@ export default function GemsSection() {
   return (
     <section
       id="gems"
-      className="relative w-full py-16 px-6 md:py-24 md:px-8"
+      className="relative w-full pt-16 pb-0 px-6 md:pt-24 md:pb-0 md:px-8"
       style={{
         backgroundColor: "#f1f3f4",
         color: "#202124",

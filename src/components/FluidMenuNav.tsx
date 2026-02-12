@@ -7,6 +7,7 @@ import {
   PocketKnife,
   Compass,
   Balloon,
+  Smile,
 } from "lucide-react";
 import { useEffect, useRef, useState } from "react";
 import Lottie, { type LottieRef } from "lottie-react";
@@ -25,6 +26,7 @@ const NAV_ITEMS = [
   { label: "Skills", icon: <PocketKnife size={NAV_ICON_SIZE} strokeWidth={1.5} />, href: "/#skills" },
   { label: "Code", icon: <Compass size={NAV_ICON_SIZE} strokeWidth={1.5} />, href: "/#code" },
   { label: "Gems", icon: <Balloon size={NAV_ICON_SIZE} strokeWidth={1.5} />, href: "/#gems" },
+  { label: "Referrals", icon: <Smile size={NAV_ICON_SIZE} strokeWidth={1.5} />, href: "/#referrals" },
   { label: "Contact", href: "/#gems" },
 ];
 

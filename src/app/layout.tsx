@@ -1,5 +1,5 @@
 import type { Metadata } from "next";
-import { Caveat, Geist, Geist_Mono, Lora, Poppins, Roboto } from "next/font/google";
+import { Archivo, Caveat, Geist, Geist_Mono, Lora, Oswald, Poppins, Roboto } from "next/font/google";
 import SectionCursorLoader from "@/components/SectionCursorLoader";
 import FluidMenuNav from "@/components/FluidMenuNav";
 import "./globals.css";
@@ -37,6 +37,18 @@ const caveat = Caveat({
   weight: ["400", "500", "600", "700"],
 });
 
+const oswald = Oswald({
+  variable: "--font-oswald",
+  subsets: ["latin"],
+  weight: ["400", "500", "600", "700"],
+});
+
+const archivo = Archivo({
+  variable: "--font-archivo",
+  subsets: ["latin"],
+  weight: ["500", "600", "700"],
+});
+
 export const metadata: Metadata = {
   title: "Portfolio",
   description: "Personal portfolio",
@@ -50,7 +62,7 @@ export default function RootLayout({
   return (
     <html lang="en">
       <body
-        className={`${geistSans.variable} ${geistMono.variable} ${poppins.variable} ${lora.variable} ${roboto.variable} ${caveat.variable} font-sans antialiased`}
+        className={`${geistSans.variable} ${geistMono.variable} ${poppins.variable} ${lora.variable} ${roboto.variable} ${caveat.variable} ${oswald.variable} ${archivo.variable} font-sans antialiased`}
       >
         {children}
         <SectionCursorLoader />
