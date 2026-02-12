@@ -1,5 +1,9 @@
 "use client";
 
+import { useState } from "react";
+import { MessageCircle } from "lucide-react";
+import ChatModal from "./ChatModal";
+
 /**
  * Projects section — ChatGPT projects UI style.
  * Clean, minimalist, white canvas; prominent title, list with title/description/date.
@@ -27,51 +31,73 @@ const PLACEHOLDER_ENTRIES = [
 ];
 
 export default function ProjectsSection() {
+  const [activeJob, setActiveJob] = useState<string | null>(null);
+
   return (
-    <section
-      id="projects"
-      className="relative w-full bg-white py-16 px-6 md:py-24 md:px-8"
-      style={{ color: "#171717" }}
-    >
-      <div className="mx-auto max-w-3xl">
-        {/* Header: title */}
-        <header className="flex flex-wrap items-center justify-between gap-4">
-          <div className="flex items-center gap-3">
-            <span className="text-[#6e6e80]" aria-hidden>
-              {FOLDER_ICON}
-            </span>
-            <h2 className="text-4xl font-semibold tracking-tight text-[#171717] md:text-5xl">
-              Projects
-            </h2>
-          </div>
-        </header>
+    <>
+      <section
+        id="projects"
+        className="relative w-full bg-white py-16 px-6 md:py-24 md:px-8"
+        style={{ color: "#171717" }}
+      >
+        <div className="mx-auto max-w-3xl">
+          {/* Header: title */}
+          <header className="flex flex-wrap items-center justify-between gap-4">
+            <div className="flex items-center gap-3">
+              <span className="text-[#6e6e80]" aria-hidden>
+                {FOLDER_ICON}
+              </span>
+              <h2 className="text-4xl font-semibold tracking-tight text-[#171717] md:text-5xl">
+                Projects
+              </h2>
+            </div>
+          </header>
 
-        {/* List: title, description, date — generous spacing, no dividers */}
-        <ul className="mt-12 space-y-10">
-          {PLACEHOLDER_ENTRIES.map((item, i) => (
-            <li key={i} className="group">
-              <div className="flex flex-col gap-1 sm:flex-row sm:items-baseline sm:justify-between">
-                <div>
-                  <h3 className="text-lg font-semibold leading-snug text-[#171717] md:text-xl">
-                    {item.title}
-                  </h3>
-                  <p className="mt-0.5 text-base leading-relaxed text-[#6e6e80]">
-                    {item.description}
-                  </p>
+          {/* List: title, description, date — generous spacing, no dividers */}
+          <ul className="mt-12 space-y-10">
+            {PLACEHOLDER_ENTRIES.map((item, i) => (
+              <li key={i} className="group">
+                <div className="flex flex-col gap-1 sm:flex-row sm:items-baseline sm:justify-between">
+                  <div className="flex-1">
+                    <h3 className="text-lg font-semibold leading-snug text-[#171717] md:text-xl">
+                      {item.title}
+                    </h3>
+                    <p className="mt-0.5 text-base leading-relaxed text-[#6e6e80]">
+                      {item.description}
+                    </p>
+                  </div>
+                  <div className="mt-1 flex shrink-0 items-center gap-3 sm:mt-0 sm:ml-4">
+                    <span className="text-sm text-[#6e6e80]">
+                      {item.date}
+                    </span>
+                    <button
+                      onClick={() => setActiveJob(item.title)}
+                      className="inline-flex items-center justify-center rounded-md p-1.5 text-[#6e6e80] transition-colors hover:bg-[#f0f0f0] hover:text-[#171717]"
+                      aria-label={`Chat about ${item.title}`}
+                      title="Ask about this role"
+                    >
+                      <MessageCircle size={18} />
+                    </button>
+                  </div>
                 </div>
-                <span className="mt-1 shrink-0 text-sm text-[#6e6e80] sm:mt-0 sm:ml-4">
-                  {item.date}
-                </span>
-              </div>
-            </li>
-          ))}
-        </ul>
+              </li>
+            ))}
+          </ul>
 
-        {/* Footer disclaimer — subtle */}
-        <p className="mt-16 text-center text-xs text-[#a3a3a3]">
-          Work experience. Replace placeholder entries with your real projects.
-        </p>
-      </div>
-    </section>
+          {/* Footer disclaimer — subtle */}
+          <p className="mt-16 text-center text-xs text-[#a3a3a3]">
+            Work experience. Replace placeholder entries with your real projects.
+          </p>
+        </div>
+      </section>
+
+      {/* Chat overlay */}
+      {activeJob && (
+        <ChatModal
+          jobTitle={activeJob}
+          onClose={() => setActiveJob(null)}
+        />
+      )}
+    </>
   );
 }

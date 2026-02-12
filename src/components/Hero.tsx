@@ -10,108 +10,166 @@ const UNICORN_SDK_URL =
 
 const LABELS = ["Alex Buechel", "Senior PM"];
 const FLIP_INTERVAL_MS = 4500;
-const SLOT_COUNT = 12; // max length; shorter label is padded with spaces
-
-const LETTER_STYLE =
-  "text-[clamp(2.25rem,6vw,3.75rem)] uppercase leading-none text-zinc-100/90";
-const TEXT_SHADOW =
-  "0 0 40px rgba(255,255,255,0.06), 0 1px 2px rgba(0,0,0,0.2)";
+const SLOT_COUNT = 12;
 const FLIP_DURATION = 0.35;
 
-/** Pad string to SLOT_COUNT with spaces (for consistent slot count). */
-function padToSlots(s: string): string {
-  const chars = s.split("");
-  while (chars.length < SLOT_COUNT) chars.push(" ");
-  return chars.slice(0, SLOT_COUNT).join("");
-}
+const TEXT_SHADOW =
+  "0 0 40px rgba(255,255,255,0.06), 0 1px 2px rgba(0,0,0,0.2)";
 
+/*
+ * Slot sizing: 12 slots must fit ~80vh.
+ * SLOT_H = height of one full slot = line-height of the letter.
+ * Each half = SLOT_H / 2, clipped so only its half of the glyph shows.
+ * Using CSS clamp so it scales between small and large screens.
+ */
+const SLOT_H = "clamp(2.4rem, 5.5vh, 3.6rem)";
+const FONT_SIZE = "clamp(2rem, 5vh, 3.2rem)";
+
+function padToSlots(s: string): string {
+  return s.padEnd(SLOT_COUNT).slice(0, SLOT_COUNT);
+}
 const LABELS_PADDED = LABELS.map(padToSlots);
 
-/** Single letter flip slot: top half flips away, bottom half flips in (split-flap style). */
-function FlipSlot({
+/* ------------------------------------------------------------------ */
+/* Half renders one cropped half (top or bottom) of a single letter.  */
+/* The letter is absolutely positioned inside a clipped container.     */
+/* ------------------------------------------------------------------ */
+function Half({
   char,
-  delay = 0,
-  style: fontStyle,
+  half,
 }: {
   char: string;
-  delay?: number;
-  style: string;
+  half: "top" | "bottom";
 }) {
-  const [displayChar, setDisplayChar] = useState(char);
-  const [nextChar, setNextChar] = useState(char);
-  const [isFlipping, setIsFlipping] = useState(false);
-  const timeoutRef = useRef<ReturnType<typeof setTimeout>>();
-
-  useEffect(() => {
-    if (char === displayChar && !isFlipping) return;
-    if (isFlipping) return;
-    setNextChar(char);
-    setIsFlipping(true);
-    timeoutRef.current = setTimeout(() => {
-      setDisplayChar(char);
-      setIsFlipping(false);
-    }, FLIP_DURATION * 1000 + 50);
-    return () => {
-      if (timeoutRef.current) clearTimeout(timeoutRef.current);
-    };
-  }, [char, displayChar, isFlipping]);
-
   return (
     <div
-      className="flex flex-col overflow-hidden"
-      style={{
-        height: "clamp(2.5rem, 6.5vw, 4rem)",
-        perspective: "400px",
-      }}
+      className="relative w-full overflow-hidden"
+      style={{ height: `calc(${SLOT_H} / 2)` }}
     >
-      {/* Top half: current char, flips up (rotateX -90) */}
-      <div
-        className="flex flex-1 items-end justify-center overflow-hidden"
-        style={{ transformStyle: "preserve-3d" }}
+      <span
+        className="absolute left-1/2 -translate-x-1/2 whitespace-pre font-semibold uppercase text-zinc-100/90"
+        style={{
+          fontSize: FONT_SIZE,
+          lineHeight: SLOT_H,
+          height: SLOT_H,
+          top: half === "top" ? "0" : `calc(-1 * ${SLOT_H} / 2)`,
+          textShadow: TEXT_SHADOW,
+        }}
       >
-        <motion.span
-          className={`${fontStyle} flex items-end justify-center`}
-          style={{
-            textShadow: TEXT_SHADOW,
-            transformOrigin: "bottom",
-          }}
-          animate={{ rotateX: isFlipping ? -90 : 0 }}
-          transition={{
-            duration: isFlipping ? FLIP_DURATION : 0,
-            delay: isFlipping ? delay / 1000 : 0,
-            ease: "easeIn",
-          }}
-        >
-          {displayChar}
-        </motion.span>
-      </div>
-      <div className="h-px shrink-0 bg-zinc-600/40" aria-hidden />
-      {/* Bottom half: next char, flips from 90 to 0 */}
-      <div
-        className="flex flex-1 items-start justify-center overflow-hidden"
-        style={{ transformStyle: "preserve-3d" }}
-      >
-        <motion.span
-          className={`${fontStyle} flex items-start justify-center`}
-          style={{
-            textShadow: TEXT_SHADOW,
-            transformOrigin: "top",
-          }}
-          initial={false}
-          animate={{ rotateX: isFlipping ? 0 : 90 }}
-          transition={{
-            duration: isFlipping ? FLIP_DURATION : 0,
-            delay: isFlipping ? delay / 1000 : 0,
-            ease: "easeOut",
-          }}
-        >
-          {nextChar}
-        </motion.span>
-      </div>
+        {char}
+      </span>
     </div>
   );
 }
 
+/* ------------------------------------------------------------------ */
+/* FlipSlot: one character position in the split-flap display.        */
+/* - Static layers:  new char top-half behind, old char bottom-half   */
+/* - Flipping layers: old char top-half (flips away),                 */
+/*                    new char bottom-half (flips in after delay)      */
+/* ------------------------------------------------------------------ */
+function FlipSlot({
+  char,
+  delay = 0,
+}: {
+  char: string;
+  delay?: number;
+}) {
+  const [current, setCurrent] = useState(char);
+  const [next, setNext] = useState(char);
+  const [flipping, setFlipping] = useState(false);
+  const timer = useRef<ReturnType<typeof setTimeout>>(null);
+
+  useEffect(() => {
+    if (char === current && !flipping) return;
+    if (flipping) return;
+    setNext(char);
+    setFlipping(true);
+    timer.current = setTimeout(() => {
+      setCurrent(char);
+      setFlipping(false);
+    }, (FLIP_DURATION * 2 + 0.05) * 1000);
+    return () => {
+      if (timer.current) clearTimeout(timer.current);
+    };
+  }, [char, current, flipping]);
+
+  const isSpace = current === " " && next === " ";
+
+  return (
+    <div
+      className="relative"
+      style={{
+        width: "clamp(2rem, 5vh, 3rem)",
+        height: SLOT_H,
+        perspective: "300px",
+      }}
+    >
+      {isSpace ? null : (
+        <>
+          {/* --- static layers (always visible) --- */}
+          {/* New char top half (sits behind the flipping old top) */}
+          <div className="absolute inset-x-0 top-0 z-0">
+            <Half char={next} half="top" />
+          </div>
+          {/* Old char bottom half (sits behind the flipping new bottom) */}
+          <div className="absolute inset-x-0 bottom-0 z-0">
+            <Half char={current} half="bottom" />
+          </div>
+
+          {/* Separator line */}
+          <div
+            className="absolute inset-x-0 z-20 h-px bg-zinc-700/50"
+            style={{ top: `calc(${SLOT_H} / 2)` }}
+            aria-hidden
+          />
+
+          {/* --- flipping layers --- */}
+          {/* Old char top half - flips away (rotateX to -90) */}
+          <motion.div
+            className="absolute inset-x-0 top-0 z-10"
+            style={{
+              transformOrigin: "bottom center",
+              transformStyle: "preserve-3d",
+              backfaceVisibility: "hidden",
+            }}
+            animate={{ rotateX: flipping ? -90 : 0 }}
+            transition={{
+              duration: flipping ? FLIP_DURATION : 0,
+              delay: flipping ? delay / 1000 : 0,
+              ease: "easeIn",
+            }}
+          >
+            <Half char={current} half="top" />
+          </motion.div>
+
+          {/* New char bottom half - flips in (from 90 to 0) */}
+          <motion.div
+            className="absolute inset-x-0 bottom-0 z-10"
+            style={{
+              transformOrigin: "top center",
+              transformStyle: "preserve-3d",
+              backfaceVisibility: "hidden",
+            }}
+            initial={false}
+            animate={{ rotateX: flipping ? 0 : 90 }}
+            transition={{
+              duration: flipping ? FLIP_DURATION : 0,
+              delay: flipping ? delay / 1000 + FLIP_DURATION : 0,
+              ease: "easeOut",
+            }}
+          >
+            <Half char={next} half="bottom" />
+          </motion.div>
+        </>
+      )}
+    </div>
+  );
+}
+
+/* ------------------------------------------------------------------ */
+/* Hero                                                                */
+/* ------------------------------------------------------------------ */
 export default function Hero() {
   const [activeIndex, setActiveIndex] = useState(0);
 
@@ -149,21 +207,16 @@ export default function Hero() {
         aria-hidden
       />
 
-      {/* Per-letter flip clock */}
+      {/* Per-letter split-flap display */}
       <div
-        className="absolute left-6 top-1/2 z-10 flex -translate-y-1/2 flex-col items-center gap-0 select-none sm:left-10"
+        className="absolute left-6 top-1/2 z-10 flex -translate-y-1/2 flex-col items-center select-none sm:left-10"
         style={{ fontFamily: "var(--font-archivo), sans-serif" }}
         aria-live="polite"
         aria-atomic
         aria-label={activeLabel}
       >
-        {chars.map((_, i) => (
-          <FlipSlot
-            key={i}
-            char={chars[i]}
-            delay={i * 35}
-            style={`${LETTER_STYLE} font-semibold`}
-          />
+        {chars.map((c, i) => (
+          <FlipSlot key={i} char={c} delay={i * 40} />
         ))}
       </div>
     </section>

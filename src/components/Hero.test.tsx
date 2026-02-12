@@ -17,12 +17,13 @@ describe("Hero", () => {
     expect(sceneWrapper).toBeDefined();
   });
 
-  it("renders flip-clock block with vertical stacked name (initial: Alex Buechel)", () => {
-    const { getByText, container } = render(<Hero />);
-    expect(getByText("A")).toBeDefined();
-    expect(getByText("B")).toBeDefined();
-    const verticalStack = container.querySelector('[style*="font-family"]');
-    expect(verticalStack?.textContent).toBe("AlexBuechel");
+  it("renders per-letter flip-clock block (initial: Alex Buechel)", () => {
+    const { getAllByText, container } = render(<Hero />);
+    expect(getAllByText("A").length).toBeGreaterThanOrEqual(1);
+    expect(getAllByText("B").length).toBeGreaterThanOrEqual(1);
+    const flipBlock = container.querySelector('[style*="font-family"]');
+    expect(flipBlock).toBeDefined();
+    expect(flipBlock?.children.length).toBe(12);
   });
 
   it("flip block has aria-label for accessibility and shows one of the labels", () => {
