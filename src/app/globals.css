@@ -4,6 +4,15 @@
   --background: #ffffff;
   --foreground: #171717;
   --muted: #f4f4f5;
+  /* Aurora background (aurora-background.tsx) */
+  --white: #ffffff;
+  --black: #000000;
+  --transparent: transparent;
+  --blue-300: #93c5fd;
+  --blue-400: #60a5fa;
+  --blue-500: #3b82f6;
+  --indigo-300: #a5b4fc;
+  --violet-200: #ddd6fe;
   /* Deepest layer (body); shows at edges and behind sticky footer reveal */
   --page-bg: #000000;
   /* Rounded corner radius for sticky footer reveal (main content bottom edge); larger = more Dataleap-like */
@@ -25,11 +34,22 @@
   --font-lora: var(--font-lora);
   --font-roboto: var(--font-roboto);
   --font-caveat: var(--font-caveat);
+  --font-oswald: var(--font-oswald);
+  --font-archivo: var(--font-archivo);
   --animate-marquee: marquee var(--duration, 30s) linear infinite;
   --animate-marquee-reverse: marquee var(--duration, 30s) linear reverse infinite;
+  --animate-aurora: aurora 60s linear infinite;
   @keyframes marquee {
     to {
       transform: translateX(-50%);
+    }
+  }
+  @keyframes aurora {
+    from {
+      background-position: 50% 50%, 50% 50%;
+    }
+    to {
+      background-position: 350% 50%, 350% 50%;
     }
   }
 }

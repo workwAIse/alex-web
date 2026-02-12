@@ -46,16 +46,17 @@ For embed options and docs, see [Unicorn Studio – Embed](https://www.unicorn.s
 
 ## Sections
 
-The homepage includes four product-themed sections (placeholders for real content):
+The homepage includes five product-themed sections plus a Referrals section (placeholders for real content):
 
-| Section   | Product | Label    | Future content  |
-| --------- | ------- | -------- | --------------- |
-| `#projects` | OpenAI  | Projects | Work experience |
-| `#skills`   | Claude  | Skills   | My skills (with logo marquee at bottom) |
-| `#code`     | Cursor  | Code     | Hobby projects  |
-| `#gems`     | Gemini  | Gems     | Private stuff   |
+| Section     | Product | Label     | Future content  |
+| ----------- | ------- | --------- | --------------- |
+| `#projects` | OpenAI  | Projects  | Work experience |
+| `#skills`   | Claude  | Skills    | My skills (with logo marquee at bottom) |
+| `#code`     | Cursor  | Code      | Hobby projects  |
+| `#gems`     | Gemini  | Gems      | Private stuff   |
+| `#referrals`| —       | Referrals | What people say (anonymized referral quotes) |
 
-Each section uses brand-aligned colors, typography, and layout. Add your real copy and data in the corresponding components when ready.
+Each section uses brand-aligned colors, typography, and layout. Add your real copy and data in the corresponding components when ready. The Referrals section uses an **AuroraBackground** (animated aurora gradient from `src/components/ui/aurora-background.tsx`) and a scrolling testimonials-style layout (dummy profile icon and title only, no names). It is linked from the side nav with a Smile icon. The custom cursor is not changed over the Referrals section (normal cursor).
 
 ### Sticky footer reveal
 
@@ -82,7 +83,7 @@ The custom cursor is disabled when the user prefers reduced motion or has a coar
 
 The site uses a **fluid corner menu** in the bottom-right:
 
-- **`FluidMenuNav`** (`src/components/FluidMenuNav.tsx`) – Fixed at bottom-right (`bottom-4 right-4`). The trigger is the **AI logo** (Lottie from `public/AI logo Foriday.json`). Tapping it expands the menu **upward** with nav items (Home, Projects, Skills, Code, Gems, About, Contact). Item clicks smooth-scroll to the corresponding section. Built with **`fluid-menu`** UI primitives.
+- **`FluidMenuNav`** (`src/components/FluidMenuNav.tsx`) – Fixed at bottom-right (`bottom-4 right-4`). The trigger is the **AI logo** (Lottie from `public/AI logo Foriday.json`). Tapping it expands the menu **upward** with nav items (Home, Projects, Skills, Code, Gems, Referrals, Contact). Referrals uses a Smile icon and smooth-scrolls to `#referrals`. Item clicks smooth-scroll to the corresponding section. Built with **`fluid-menu`** UI primitives.
 
 - **`src/components/ui/fluid-menu.tsx`** – `Menu`, `MenuItem`, and `MenuContainer`. `MenuContainer` supports `expandDirection: "up" | "down"` so the stack opens above the trigger (for corner placement) or below.
 
@@ -93,6 +94,8 @@ The previous non-interactive **`AILogoCorner`** and the alternate **`CircleMenuN
 Reusable UI primitives live in **`src/components/ui/`**. This folder follows the [shadcn/ui](https://ui.shadcn.com/) convention: keeping it separate from feature components (`src/components/`) makes it clear which components are generic building blocks vs. page-specific sections, and keeps the path consistent if you later add more shadcn components via the CLI.
 
 - **`src/components/ui/fluid-menu.tsx`** – Fluid vertical menu: `Menu` (dropdown), `MenuItem`, and `MenuContainer` (expandable stack with optional `expandDirection="up"`). Used by `FluidMenuNav`.
+- **`src/components/ui/aurora-background.tsx`** – Animated aurora gradient background (blur + moving gradient, optional radial mask). Used as the background of the Referrals section. Supports `showRadialGradient`; uses CSS variables for colors and `animate-aurora` keyframes from `globals.css`.
+- **`src/components/ui/testimonials-columns-1.tsx`** – Scrolling testimonials column (`TestimonialsColumn`) for the Referrals section. Uses `motion` for infinite vertical scroll; displays anonymized items (dummy user icon + title/role only). Exports type `ReferralItem`.
 - **`src/components/ui/circle-menu.tsx`** – Animated circular FAB menu (Framer Motion). Used by `CircleMenuNav`; the nav is not currently rendered in the root layout.
 - **`src/components/ui/marquee.tsx`** – Horizontal marquee (infinite scroll). Used by `MarqueeDemo` at the bottom of the Skills (Claude) section for a logo strip; supports `direction`, `speed`, and `pauseOnHover`. Custom animation is defined in `globals.css` (`@theme`).
 - **`src/components/ui/marquee-demo.tsx`** – Renders the Skills section logo strip via [Logo.dev](https://logo.dev) (logos only). Edit **`MARQUEE_COMPANIES`** to change entries; use `domain` for Logo.dev or `logoSrc` for local assets (e.g. Claude, Gemini use section cursor icons). Set **`NEXT_PUBLIC_LOGO_DEV_PUBLISHABLE_KEY`** in `.env.local` for Logo.dev logos.
@@ -116,5 +119,5 @@ To change which companies appear, edit **`MARQUEE_COMPANIES`** in `src/component
 - [TypeScript](https://www.typescriptlang.org/)
 - [Tailwind CSS](https://tailwindcss.com/)
 - [Unicorn Studio](https://unicorn.studio/) (WebGL hero scene)
-- [Framer Motion](https://www.framer.com/motion/) + [lucide-react](https://lucide.dev/) (CircleMenu)
+- [Framer Motion](https://www.framer.com/motion/) + [motion](https://motion.dev/) (Referrals section) + [lucide-react](https://lucide.dev/) (icons, CircleMenu)
 - [Vitest](https://vitest.dev/) + [React Testing Library](https://testing-library.com/react) for tests
