@@ -49,9 +49,9 @@ For embed options and docs, see [Unicorn Studio – Embed](https://www.unicorn.s
 
 The homepage includes five product-themed sections plus a Referrals section (placeholders for real content):
 
-| Section     | Product | Label     | Future content  |
-| ----------- | ------- | --------- | --------------- |
-| `#projects` | OpenAI  | Projects  | Work experience |
+| Section     | Product | Label     | Content  |
+| ----------- | ------- | --------- | -------- |
+| `#projects` | OpenAI  | Projects  | Work experience: four case studies (Squat Test, EGYM Genius, Fitness Hub seca edition, Mortgage Comparison Engine Rebuild) with Goal, My role, Key work, Impact; AI chat per project |
 | `#skills`   | Claude  | Skills    | My skills (with logo marquee at bottom) |
 | `#code`     | Cursor  | Code      | Hobby projects  |
 | `#gems`     | Gemini  | Gems      | Private stuff   |
