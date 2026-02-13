@@ -29,30 +29,59 @@ export async function POST(req: NextRequest) {
       content: message,
     });
 
-    // Run the assistant and wait for completion (SDK handles polling)
-    await openai.beta.threads.runs.createAndPoll(thread.id, {
+    // Stream the assistant's response
+    const assistantStream = openai.beta.threads.runs.stream(thread.id, {
       assistant_id: ASSISTANT_ID,
     });
 
-    // Fetch the latest assistant message
-    const messages = await openai.beta.threads.messages.list(thread.id, {
-      order: "desc",
-      limit: 1,
+    // Build a ReadableStream that forwards SSE events to the client
+    const encoder = new TextEncoder();
+    const readable = new ReadableStream({
+      async start(controller) {
+        // First event: send the threadId so the client can track conversations
+        controller.enqueue(
+          encoder.encode(
+            `data: ${JSON.stringify({ type: "thread.id", threadId: thread.id })}\n\n`,
+          ),
+        );
+
+        // Listen for text deltas and forward them
+        assistantStream.on("textDelta", (delta) => {
+          if (delta.value) {
+            controller.enqueue(
+              encoder.encode(
+                `data: ${JSON.stringify({ type: "text.delta", text: delta.value })}\n\n`,
+              ),
+            );
+          }
+        });
+
+        // When the run completes, signal done and close
+        assistantStream.on("end", () => {
+          controller.enqueue(encoder.encode("data: [DONE]\n\n"));
+          controller.close();
+        });
+
+        // Handle errors
+        assistantStream.on("error", (err) => {
+          console.error("Stream error:", err);
+          controller.enqueue(
+            encoder.encode(
+              `data: ${JSON.stringify({ type: "error", message: err instanceof Error ? err.message : "Stream error" })}\n\n`,
+            ),
+          );
+          controller.enqueue(encoder.encode("data: [DONE]\n\n"));
+          controller.close();
+        });
+      },
     });
 
-    const assistantMsg = messages.data.find((m) => m.role === "assistant");
-
-    let responseText = "Sorry, I couldn't generate a response.";
-    if (assistantMsg) {
-      const textBlock = assistantMsg.content.find((c) => c.type === "text");
-      if (textBlock && textBlock.type === "text") {
-        responseText = textBlock.text.value;
-      }
-    }
-
-    return NextResponse.json({
-      response: responseText,
-      threadId: thread.id,
+    return new Response(readable, {
+      headers: {
+        "Content-Type": "text/event-stream",
+        "Cache-Control": "no-cache",
+        Connection: "keep-alive",
+      },
     });
   } catch (err: unknown) {
     console.error("Chat API error:", err);

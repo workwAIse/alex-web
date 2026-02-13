@@ -1,7 +1,8 @@
 "use client";
 
 import { useState } from "react";
-import { MessageCircle } from "lucide-react";
+import Lottie from "lottie-react";
+import messageIconAnimation from "../../public/Interactive Digital Assistant.json";
 import ChatModal from "./ChatModal";
 
 /**
@@ -76,7 +77,12 @@ export default function ProjectsSection() {
                       aria-label={`Chat about ${item.title}`}
                       title="Ask about this role"
                     >
-                      <MessageCircle size={18} />
+                      <Lottie
+                        animationData={messageIconAnimation}
+                        loop
+                        autoplay
+                        style={{ width: 60, height: 60 }}
+                      />
                     </button>
                   </div>
                 </div>

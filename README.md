@@ -35,8 +35,9 @@ Deploy to [Vercel](https://vercel.com): connect your repo to Vercel or use the [
 
 ## Hero and Unicorn Studio
 
-The hero section uses a WebGL scene from **Unicorn Studio**:
+The hero section uses a WebGL scene from **Unicorn Studio** and a **typewriter** headline in the top-left:
 
+- **Typewriter:** Cycles through four phrases with a typing/deleting effect: “👋 Hello, welcome” → “I am Alex Büchel” → “a Senior PM,” → “crafting digital products 💻”. Implemented with `Typewriter` from `src/components/ui/typewriter.tsx`. Font: **Climate Crisis** variable font ([@fontsource-variable/climate-crisis](https://www.npmjs.com/package/@fontsource-variable/climate-crisis)), from [bestfreefonts.com/climate-crisis](https://www.bestfreefonts.com/climate-crisis) / [kampanjat.hs.fi/climatefont](https://kampanjat.hs.fi/climatefont).
 - **Project ID:** `i9BQoAQqkzcqJPHn60gG`
 - **SDK version:** 2.0.5 (loaded via custom `sdkUrl`)
 

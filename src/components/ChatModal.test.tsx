@@ -2,6 +2,8 @@ import { render, screen, fireEvent } from "@testing-library/react";
 import { describe, expect, it, vi, beforeEach } from "vitest";
 import ChatModal from "./ChatModal";
 
+vi.mock("lottie-react", () => ({ default: () => null }));
+
 /* Mock fetch globally */
 const mockFetch = vi.fn();
 beforeEach(() => {
@@ -39,7 +41,7 @@ describe("ChatModal", () => {
     onClose: vi.fn(),
   };
 
-  it("renders the macOS window chrome with ChatGPT title", () => {
+  it("renders the macOS window chrome with site title", () => {
     mockFetch.mockResolvedValue({
       ok: true,
       json: () =>
@@ -50,8 +52,7 @@ describe("ChatModal", () => {
     });
 
     render(<ChatModal {...defaultProps} />);
-    expect(screen.getByText("ChatGPT")).toBeDefined();
-    expect(screen.getByText("chatgpt.com")).toBeDefined();
+    expect(screen.getByText("alexb-ai.vercel.app")).toBeDefined();
   });
 
   it("auto-sends the initial prompt on mount", () => {
