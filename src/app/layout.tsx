@@ -1,5 +1,5 @@
 import type { Metadata } from "next";
-import { Archivo, Caveat, Geist, Geist_Mono, Lora, Oswald, Poppins, Roboto } from "next/font/google";
+import { Archivo, Caveat, Geist, Geist_Mono, Lora, Montserrat, Oswald, Poppins, Roboto } from "next/font/google";
 import SectionCursorLoader from "@/components/SectionCursorLoader";
 import FluidMenuNav from "@/components/FluidMenuNav";
 import "@fontsource-variable/climate-crisis/year.css";
@@ -19,6 +19,12 @@ const poppins = Poppins({
   variable: "--font-poppins",
   subsets: ["latin"],
   weight: ["400", "500", "600", "700"],
+});
+
+const montserrat = Montserrat({
+  variable: "--font-montserrat",
+  subsets: ["latin"],
+  weight: ["500", "600", "700"],
 });
 
 const lora = Lora({
@@ -63,7 +69,7 @@ export default function RootLayout({
   return (
     <html lang="en">
       <body
-        className={`${geistSans.variable} ${geistMono.variable} ${poppins.variable} ${lora.variable} ${roboto.variable} ${caveat.variable} ${oswald.variable} ${archivo.variable} font-sans antialiased`}
+        className={`${geistSans.variable} ${geistMono.variable} ${poppins.variable} ${montserrat.variable} ${lora.variable} ${roboto.variable} ${caveat.variable} ${oswald.variable} ${archivo.variable} font-sans antialiased`}
       >
         {children}
         <SectionCursorLoader />
