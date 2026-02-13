@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import { Archivo, Caveat, Geist, Geist_Mono, Lora, Oswald, Poppins, Roboto } from "next/font/google";
 import SectionCursorLoader from "@/components/SectionCursorLoader";
 import FluidMenuNav from "@/components/FluidMenuNav";
+import "@fontsource-variable/climate-crisis/year.css";
 import "./globals.css";
 
 const geistSans = Geist({

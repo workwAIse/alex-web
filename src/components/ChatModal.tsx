@@ -1,7 +1,10 @@
 "use client";
 
-import { useCallback, useEffect, useRef, useState } from "react";
+import { memo, useCallback, useEffect, useRef, useState } from "react";
 import { AnimatePresence, motion } from "framer-motion";
+import ReactMarkdown from "react-markdown";
+import Lottie from "lottie-react";
+import aiLogoAnimation from "../../public/AI logo Foriday.json";
 
 /* ------------------------------------------------------------------ */
 /*  Types                                                              */
@@ -17,6 +20,22 @@ interface ChatModalProps {
   /** Called when the user closes the modal. */
   onClose: () => void;
 }
+
+/* ------------------------------------------------------------------ */
+/*  Stable AI avatar — extracted so it never remounts during streaming */
+/* ------------------------------------------------------------------ */
+const AiAvatar = memo(function AiAvatar() {
+  return (
+    <div className="mr-2 mt-1 flex h-12 w-12 shrink-0 items-center justify-center">
+      <Lottie
+        animationData={aiLogoAnimation}
+        loop
+        autoplay
+        style={{ width: 48, height: 48 }}
+      />
+    </div>
+  );
+});
 
 /* ------------------------------------------------------------------ */
 /*  Component                                                          */
@@ -38,12 +57,69 @@ export default function ChatModal({ jobTitle, onClose }: ChatModalProps) {
     }
   }, [messages, loading]);
 
-  /* Send a message to the API */
+  /* Helper: update the last assistant message in the array */
+  const updateLastAssistant = useCallback(
+    (updater: (content: string) => string) => {
+      setMessages((prev) => {
+        const idx = prev.findLastIndex((m) => m.role === "assistant");
+        if (idx === -1) return prev;
+        const updated = [...prev];
+        updated[idx] = { ...updated[idx], content: updater(updated[idx].content) };
+        return updated;
+      });
+    },
+    [],
+  );
+
+  /*
+   * Buffered typewriter: accumulate incoming deltas in a queue,
+   * then drain them in small chunks at a steady pace (~30 ms per chunk).
+   */
+  const textQueueRef = useRef("");
+  const drainingRef = useRef(false);
+
+  const drainQueue = useCallback(() => {
+    if (drainingRef.current) return;
+    drainingRef.current = true;
+
+    const tick = () => {
+      if (textQueueRef.current.length === 0) {
+        drainingRef.current = false;
+        return;
+      }
+      // Flush a small chunk each tick (2-4 chars) for a natural pace
+      const chunkSize = Math.min(
+        textQueueRef.current.length,
+        Math.random() < 0.3 ? 4 : 2,
+      );
+      const chunk = textQueueRef.current.slice(0, chunkSize);
+      textQueueRef.current = textQueueRef.current.slice(chunkSize);
+      updateLastAssistant((prev) => prev + chunk);
+      setTimeout(tick, 30);
+    };
+    tick();
+  }, [updateLastAssistant]);
+
+  const enqueueText = useCallback(
+    (text: string) => {
+      textQueueRef.current += text;
+      drainQueue();
+    },
+    [drainQueue],
+  );
+
+  /* Send a message to the API and stream the response */
   const sendMessage = useCallback(
     async (text: string) => {
       const userMsg: Message = { role: "user", content: text };
-      setMessages((prev) => [...prev, userMsg]);
+      // Add user message + empty assistant placeholder in one batch
+      setMessages((prev) => [
+        ...prev,
+        userMsg,
+        { role: "assistant", content: "" },
+      ]);
       setLoading(true);
+      textQueueRef.current = "";
 
       try {
         const res = await fetch("/api/chat", {
@@ -54,29 +130,70 @@ export default function ChatModal({ jobTitle, onClose }: ChatModalProps) {
 
         if (!res.ok) throw new Error("API request failed");
 
-        const data = (await res.json()) as {
-          response: string;
-          threadId: string;
-        };
+        const reader = res.body?.getReader();
+        if (!reader) throw new Error("No response body");
 
-        setThreadId(data.threadId);
-        setMessages((prev) => [
-          ...prev,
-          { role: "assistant", content: data.response },
-        ]);
+        const decoder = new TextDecoder();
+        let sseBuffer = "";
+
+        while (true) {
+          const { done, value } = await reader.read();
+          if (done) break;
+
+          sseBuffer += decoder.decode(value, { stream: true });
+
+          // Process complete SSE lines
+          const lines = sseBuffer.split("\n");
+          sseBuffer = lines.pop() ?? "";
+
+          for (const line of lines) {
+            const trimmed = line.trim();
+            if (!trimmed.startsWith("data: ")) continue;
+
+            const payload = trimmed.slice(6);
+            if (payload === "[DONE]") continue;
+
+            try {
+              const event = JSON.parse(payload) as {
+                type: string;
+                threadId?: string;
+                text?: string;
+                message?: string;
+              };
+
+              if (event.type === "thread.id" && event.threadId) {
+                setThreadId(event.threadId);
+              } else if (event.type === "text.delta" && event.text) {
+                enqueueText(event.text);
+              } else if (event.type === "error") {
+                textQueueRef.current = "";
+                updateLastAssistant(() => "Something went wrong. Please try again.");
+              }
+            } catch {
+              // ignore malformed JSON lines
+            }
+          }
+        }
+
+        // Wait for the typewriter queue to finish draining
+        await new Promise<void>((resolve) => {
+          const wait = () => {
+            if (textQueueRef.current.length === 0 && !drainingRef.current) {
+              resolve();
+            } else {
+              setTimeout(wait, 50);
+            }
+          };
+          wait();
+        });
       } catch {
-        setMessages((prev) => [
-          ...prev,
-          {
-            role: "assistant",
-            content: "Something went wrong. Please try again.",
-          },
-        ]);
+        textQueueRef.current = "";
+        updateLastAssistant(() => "Something went wrong. Please try again.");
       } finally {
         setLoading(false);
       }
     },
-    [threadId],
+    [threadId, updateLastAssistant, enqueueText],
   );
 
   /* Auto-send the initial prompt on mount */
@@ -109,7 +226,9 @@ export default function ChatModal({ jobTitle, onClose }: ChatModalProps) {
       {/* Backdrop */}
       <motion.div
         key="chat-backdrop"
-        className="fixed inset-0 z-[9999] flex items-center justify-center bg-black/50 backdrop-blur-sm"
+        className="fixed inset-0 z-[10000] flex items-center justify-center bg-black/40 backdrop-blur-sm"
+        style={{ cursor: "default" }}
+        data-cursor-area="nav"
         initial={{ opacity: 0 }}
         animate={{ opacity: 1 }}
         exit={{ opacity: 0 }}
@@ -117,7 +236,7 @@ export default function ChatModal({ jobTitle, onClose }: ChatModalProps) {
       >
         {/* macOS-style browser window */}
         <motion.div
-          className="relative flex flex-col overflow-hidden rounded-xl bg-[#1e1e1e] shadow-2xl"
+          className="relative flex flex-col overflow-hidden rounded-xl bg-white shadow-2xl"
           style={{ width: "min(720px, 92vw)", height: "min(560px, 80vh)" }}
           initial={{ scale: 0.92, opacity: 0, y: 30 }}
           animate={{ scale: 1, opacity: 1, y: 0 }}
@@ -126,7 +245,7 @@ export default function ChatModal({ jobTitle, onClose }: ChatModalProps) {
           onClick={(e) => e.stopPropagation()}
         >
           {/* ── Title bar ── */}
-          <div className="flex items-center gap-2 border-b border-white/10 bg-[#2b2b2b] px-4 py-2.5">
+          <div className="flex items-center gap-2 border-b border-black/10 bg-[#f5f5f5] px-4 py-2.5">
             {/* Traffic lights */}
             <button
               onClick={onClose}
@@ -148,90 +267,97 @@ export default function ChatModal({ jobTitle, onClose }: ChatModalProps) {
             <span className="h-3 w-3 rounded-full bg-[#28c840]" />
 
             {/* Centered title */}
-            <span className="flex-1 text-center text-xs font-medium text-white/60 select-none truncate">
-              ChatGPT
+            <span className="flex-1 text-center text-xs font-medium text-black/50 select-none truncate">
+              alexb-ai.vercel.app
             </span>
 
             {/* Spacer to balance traffic lights */}
             <span className="w-[52px]" />
           </div>
 
-          {/* ── URL bar ── */}
-          <div className="flex items-center justify-center border-b border-white/10 bg-[#2b2b2b] px-4 py-1.5">
-            <div className="flex items-center gap-2 rounded-md bg-[#3a3a3a] px-3 py-1 text-xs text-white/50">
-              <svg
-                xmlns="http://www.w3.org/2000/svg"
-                width="10"
-                height="10"
-                viewBox="0 0 24 24"
-                fill="none"
-                stroke="currentColor"
-                strokeWidth="2"
-                strokeLinecap="round"
-                strokeLinejoin="round"
-              >
-                <rect width="18" height="11" x="3" y="11" rx="2" ry="2" />
-                <path d="M7 11V7a5 5 0 0 1 10 0v4" />
-              </svg>
-              <span>chatgpt.com</span>
-            </div>
-          </div>
-
           {/* ── Chat messages ── */}
           <div
             ref={scrollRef}
-            className="flex-1 overflow-y-auto px-5 py-4 space-y-4 bg-[#212121]"
+            className="flex-1 overflow-y-auto px-5 py-4 space-y-4 bg-white"
           >
-            {messages.map((msg, i) => (
+            {messages.map((msg, i) =>
+              /* Hide empty assistant placeholder (loading dots shown separately) */
+              msg.role === "assistant" && msg.content === "" ? null : (
               <div
                 key={i}
                 className={`flex ${msg.role === "user" ? "justify-end" : "justify-start"}`}
               >
-                {msg.role === "assistant" && (
-                  <div className="mr-2 mt-1 flex h-6 w-6 shrink-0 items-center justify-center rounded-full bg-[#10a37f]">
-                    <svg
-                      width="14"
-                      height="14"
-                      viewBox="0 0 24 24"
-                      fill="white"
-                    >
-                      <path d="M22.282 9.821a5.985 5.985 0 0 0-.516-4.91 6.046 6.046 0 0 0-6.51-2.9A6.065 6.065 0 0 0 4.981 4.18a5.985 5.985 0 0 0-3.998 2.9 6.046 6.046 0 0 0 .743 7.097 5.98 5.98 0 0 0 .51 4.911 6.051 6.051 0 0 0 6.515 2.9A5.985 5.985 0 0 0 13.26 24a6.056 6.056 0 0 0 5.772-4.206 5.99 5.99 0 0 0 3.997-2.9 6.056 6.056 0 0 0-.747-7.073zM13.26 22.43a4.476 4.476 0 0 1-2.876-1.04l.141-.081 4.779-2.758a.795.795 0 0 0 .392-.681v-6.737l2.02 1.168a.071.071 0 0 1 .038.052v5.583a4.504 4.504 0 0 1-4.494 4.494zM3.6 18.304a4.47 4.47 0 0 1-.535-3.014l.142.085 4.783 2.759a.771.771 0 0 0 .78 0l5.843-3.369v2.332a.08.08 0 0 1-.033.062L9.74 19.95a4.5 4.5 0 0 1-6.14-1.646zM2.34 7.896a4.485 4.485 0 0 1 2.366-1.973V11.6a.766.766 0 0 0 .388.676l5.815 3.355-2.02 1.168a.076.076 0 0 1-.071 0l-4.83-2.786A4.504 4.504 0 0 1 2.34 7.872zm16.597 3.855l-5.833-3.387L15.119 7.2a.076.076 0 0 1 .071 0l4.83 2.791a4.494 4.494 0 0 1-.676 8.105v-5.678a.79.79 0 0 0-.407-.667zm2.01-3.023l-.141-.085-4.774-2.782a.776.776 0 0 0-.785 0L9.409 9.23V6.897a.066.066 0 0 1 .028-.061l4.83-2.787a4.5 4.5 0 0 1 6.68 4.66zm-12.64 4.135l-2.02-1.164a.08.08 0 0 1-.038-.057V6.075a4.5 4.5 0 0 1 7.375-3.453l-.142.08L8.704 5.46a.795.795 0 0 0-.393.681zm1.097-2.365l2.602-1.5 2.607 1.5v2.999l-2.597 1.5-2.607-1.5z" />
-                    </svg>
-                  </div>
-                )}
+                {msg.role === "assistant" && <AiAvatar />}
                 <div
-                  className={`max-w-[80%] rounded-2xl px-4 py-2.5 text-sm leading-relaxed whitespace-pre-wrap ${
+                  className={`max-w-[80%] rounded-2xl px-4 py-2.5 text-sm leading-relaxed ${
                     msg.role === "user"
-                      ? "bg-[#303030] text-white"
-                      : "text-[#d1d5db]"
+                      ? "bg-[#e8e8e8] text-black"
+                      : "text-[#374151]"
                   }`}
                 >
-                  {msg.content}
+                  {msg.role === "assistant" ? (
+                    <ReactMarkdown
+                      components={{
+                        p: ({ children }) => <p className="mb-2 last:mb-0">{children}</p>,
+                        ul: ({ children }) => <ul className="mb-2 ml-4 list-disc last:mb-0">{children}</ul>,
+                        ol: ({ children }) => <ol className="mb-2 ml-4 list-decimal last:mb-0">{children}</ol>,
+                        li: ({ children }) => <li className="mb-0.5">{children}</li>,
+                        strong: ({ children }) => <strong className="font-semibold">{children}</strong>,
+                        em: ({ children }) => <em className="italic">{children}</em>,
+                        code: ({ children }) => (
+                          <code className="rounded bg-black/5 px-1.5 py-0.5 text-xs font-mono">
+                            {children}
+                          </code>
+                        ),
+                        pre: ({ children }) => (
+                          <pre className="my-2 overflow-x-auto rounded-lg bg-black/5 p-3 text-xs">
+                            {children}
+                          </pre>
+                        ),
+                        h1: ({ children }) => <h1 className="mb-2 text-lg font-bold">{children}</h1>,
+                        h2: ({ children }) => <h2 className="mb-2 text-base font-bold">{children}</h2>,
+                        h3: ({ children }) => <h3 className="mb-1.5 text-sm font-bold">{children}</h3>,
+                        a: ({ children, href }) => (
+                          <a href={href} className="text-indigo-600 underline hover:text-indigo-800" target="_blank" rel="noopener noreferrer">
+                            {children}
+                          </a>
+                        ),
+                        blockquote: ({ children }) => (
+                          <blockquote className="my-2 border-l-2 border-black/20 pl-3 italic text-black/60">
+                            {children}
+                          </blockquote>
+                        ),
+                      }}
+                    >
+                      {msg.content}
+                    </ReactMarkdown>
+                  ) : (
+                    <span className="whitespace-pre-wrap">{msg.content}</span>
+                  )}
                 </div>
               </div>
             ))}
 
-            {/* Loading indicator */}
-            {loading && (
-              <div className="flex justify-start">
-                <div className="mr-2 mt-1 flex h-6 w-6 shrink-0 items-center justify-center rounded-full bg-[#10a37f]">
-                  <svg width="14" height="14" viewBox="0 0 24 24" fill="white">
-                    <path d="M22.282 9.821a5.985 5.985 0 0 0-.516-4.91 6.046 6.046 0 0 0-6.51-2.9A6.065 6.065 0 0 0 4.981 4.18a5.985 5.985 0 0 0-3.998 2.9 6.046 6.046 0 0 0 .743 7.097 5.98 5.98 0 0 0 .51 4.911 6.051 6.051 0 0 0 6.515 2.9A5.985 5.985 0 0 0 13.26 24a6.056 6.056 0 0 0 5.772-4.206 5.99 5.99 0 0 0 3.997-2.9 6.056 6.056 0 0 0-.747-7.073zM13.26 22.43a4.476 4.476 0 0 1-2.876-1.04l.141-.081 4.779-2.758a.795.795 0 0 0 .392-.681v-6.737l2.02 1.168a.071.071 0 0 1 .038.052v5.583a4.504 4.504 0 0 1-4.494 4.494zM3.6 18.304a4.47 4.47 0 0 1-.535-3.014l.142.085 4.783 2.759a.771.771 0 0 0 .78 0l5.843-3.369v2.332a.08.08 0 0 1-.033.062L9.74 19.95a4.5 4.5 0 0 1-6.14-1.646zM2.34 7.896a4.485 4.485 0 0 1 2.366-1.973V11.6a.766.766 0 0 0 .388.676l5.815 3.355-2.02 1.168a.076.076 0 0 1-.071 0l-4.83-2.786A4.504 4.504 0 0 1 2.34 7.872zm16.597 3.855l-5.833-3.387L15.119 7.2a.076.076 0 0 1 .071 0l4.83 2.791a4.494 4.494 0 0 1-.676 8.105v-5.678a.79.79 0 0 0-.407-.667zm2.01-3.023l-.141-.085-4.774-2.782a.776.776 0 0 0-.785 0L9.409 9.23V6.897a.066.066 0 0 1 .028-.061l4.83-2.787a4.5 4.5 0 0 1 6.68 4.66zm-12.64 4.135l-2.02-1.164a.08.08 0 0 1-.038-.057V6.075a4.5 4.5 0 0 1 7.375-3.453l-.142.08L8.704 5.46a.795.795 0 0 0-.393.681zm1.097-2.365l2.602-1.5 2.607 1.5v2.999l-2.597 1.5-2.607-1.5z" />
-                  </svg>
+            {/* Loading indicator — only while waiting for the first token */}
+            {loading &&
+              messages.length > 0 &&
+              messages[messages.length - 1].role === "assistant" &&
+              messages[messages.length - 1].content === "" && (
+                <div className="flex justify-start">
+                  <AiAvatar />
+                  <div className="flex items-center gap-1.5 px-4 py-3">
+                    <span className="h-2 w-2 rounded-full bg-black/25 animate-[pulse_1.4s_ease-in-out_infinite]" />
+                    <span className="h-2 w-2 rounded-full bg-black/25 animate-[pulse_1.4s_ease-in-out_0.2s_infinite]" />
+                    <span className="h-2 w-2 rounded-full bg-black/25 animate-[pulse_1.4s_ease-in-out_0.4s_infinite]" />
+                  </div>
                 </div>
-                <div className="flex items-center gap-1.5 px-4 py-3">
-                  <span className="h-2 w-2 rounded-full bg-white/40 animate-[pulse_1.4s_ease-in-out_infinite]" />
-                  <span className="h-2 w-2 rounded-full bg-white/40 animate-[pulse_1.4s_ease-in-out_0.2s_infinite]" />
-                  <span className="h-2 w-2 rounded-full bg-white/40 animate-[pulse_1.4s_ease-in-out_0.4s_infinite]" />
-                </div>
-              </div>
-            )}
+              )}
           </div>
 
           {/* ── Input bar ── */}
           <form
             onSubmit={handleSubmit}
-            className="flex items-center gap-2 border-t border-white/10 bg-[#2b2b2b] px-4 py-3"
+            className="flex items-center gap-2 border-t border-black/10 bg-[#f5f5f5] px-4 py-3"
           >
             <input
               ref={inputRef}
@@ -240,12 +366,12 @@ export default function ChatModal({ jobTitle, onClose }: ChatModalProps) {
               onChange={(e) => setInput(e.target.value)}
               placeholder="Ask a follow-up..."
               disabled={loading}
-              className="flex-1 rounded-lg bg-[#3a3a3a] px-4 py-2 text-sm text-white placeholder-white/40 outline-none ring-1 ring-white/10 focus:ring-white/25 disabled:opacity-50"
+              className="flex-1 rounded-lg bg-[#e8e8e8] px-4 py-2 text-sm text-black placeholder-black/40 outline-none ring-1 ring-black/10 focus:ring-black/25 disabled:opacity-50"
             />
             <button
               type="submit"
               disabled={loading || !input.trim()}
-              className="flex h-9 w-9 items-center justify-center rounded-lg bg-white text-black transition-opacity hover:opacity-90 disabled:opacity-30"
+              className="flex h-9 w-9 items-center justify-center rounded-lg bg-black text-white transition-opacity hover:opacity-90 disabled:opacity-30"
               aria-label="Send message"
             >
               <svg
