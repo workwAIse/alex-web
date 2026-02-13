@@ -130,7 +130,18 @@ export default function ChatModal({ jobTitle, onClose, initialPrompt }: ChatModa
           body: JSON.stringify({ message: text, threadId }),
         });
 
-        if (!res.ok) throw new Error("API request failed");
+        if (!res.ok) {
+          let message = "Something went wrong. Please try again.";
+          try {
+            const data = (await res.json()) as { error?: string };
+            if (typeof data?.error === "string" && data.error.trim()) {
+              message = data.error;
+            }
+          } catch {
+            // ignore non-JSON or parse errors
+          }
+          throw new Error(message);
+        }
 
         const reader = res.body?.getReader();
         if (!reader) throw new Error("No response body");
@@ -169,7 +180,11 @@ export default function ChatModal({ jobTitle, onClose, initialPrompt }: ChatModa
                 enqueueText(event.text);
               } else if (event.type === "error") {
                 textQueueRef.current = "";
-                updateLastAssistant(() => "Something went wrong. Please try again.");
+                const msg =
+                  typeof event.message === "string" && event.message.trim()
+                    ? event.message
+                    : "Something went wrong. Please try again.";
+                updateLastAssistant(() => msg);
               }
             } catch {
               // ignore malformed JSON lines
@@ -188,9 +203,11 @@ export default function ChatModal({ jobTitle, onClose, initialPrompt }: ChatModa
           };
           wait();
         });
-      } catch {
+      } catch (err) {
         textQueueRef.current = "";
-        updateLastAssistant(() => "Something went wrong. Please try again.");
+        const message =
+          err instanceof Error ? err.message : "Something went wrong. Please try again.";
+        updateLastAssistant(() => message);
       } finally {
         setLoading(false);
       }

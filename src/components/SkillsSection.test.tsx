@@ -16,10 +16,13 @@ describe("SkillsSection", () => {
     ).toBeDefined();
   });
 
-  it("renders placeholder content", () => {
+  it("renders skill categories and items", () => {
     render(<SkillsSection />);
-    expect(screen.getByText("Skill 1")).toBeDefined();
-    expect(screen.getByText("Skill 2")).toBeDefined();
-    expect(screen.getByText("Skill 3")).toBeDefined();
+    expect(screen.getByRole("heading", { level: 3, name: "Product Management" })).toBeDefined();
+    expect(screen.getByRole("heading", { level: 3, name: "AI & Innovation" })).toBeDefined();
+    expect(screen.getByText("Product Strategy & Roadmapping")).toBeDefined();
+    expect(screen.getByText("LLM-powered Workflows")).toBeDefined();
+    expect(screen.getByText("German (Native)")).toBeDefined();
+    expect(screen.getByText("English (Fluent)")).toBeDefined();
   });
 });
