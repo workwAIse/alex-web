@@ -1,11 +1,46 @@
 import { NextRequest, NextResponse } from "next/server";
 import OpenAI from "openai";
 
-const openai = new OpenAI({ apiKey: process.env.OPENAI_API_KEY });
-const ASSISTANT_ID = process.env.OPENAI_ASSISTANT_ID!;
+const getOpenAI = () =>
+  new OpenAI({ apiKey: process.env.OPENAI_API_KEY! });
+
+/** Strip OpenAI-style citations 【...】 from text. Handles citations split across chunks. */
+function stripCitations(chunk: string, buffer: { value: string }): string {
+  const s = buffer.value + chunk;
+  buffer.value = "";
+  let out = "";
+  let i = 0;
+  while (i < s.length) {
+    const open = s.indexOf("【", i);
+    if (open === -1) {
+      out += s.slice(i);
+      break;
+    }
+    out += s.slice(i, open);
+    const close = s.indexOf("】", open);
+    if (close === -1) {
+      buffer.value = s.slice(open);
+      break;
+    }
+    i = close + 1;
+  }
+  return out;
+}
 
 export async function POST(req: NextRequest) {
   try {
+    const apiKey = process.env.OPENAI_API_KEY;
+    const assistantId = process.env.OPENAI_ASSISTANT_ID;
+    if (!apiKey?.trim() || !assistantId?.trim()) {
+      return NextResponse.json(
+        {
+          error:
+            "OpenAI is not configured. Add OPENAI_API_KEY and OPENAI_ASSISTANT_ID in Vercel Project Settings → Environment Variables, then redeploy.",
+        },
+        { status: 503 },
+      );
+    }
+
     const { message, threadId } = (await req.json()) as {
       message: string;
       threadId?: string;
@@ -17,6 +52,8 @@ export async function POST(req: NextRequest) {
         { status: 400 },
       );
     }
+
+    const openai = getOpenAI();
 
     // Reuse existing thread or create a new one
     const thread = threadId
@@ -31,7 +68,7 @@ export async function POST(req: NextRequest) {
 
     // Stream the assistant's response
     const assistantStream = openai.beta.threads.runs.stream(thread.id, {
-      assistant_id: ASSISTANT_ID,
+      assistant_id: assistantId, // already validated above
     });
 
     // Build a ReadableStream that forwards SSE events to the client
@@ -45,14 +82,18 @@ export async function POST(req: NextRequest) {
           ),
         );
 
-        // Listen for text deltas and forward them
+        // Listen for text deltas, strip citations 【...】, then forward
+        const citationBuffer = { value: "" };
         assistantStream.on("textDelta", (delta) => {
           if (delta.value) {
-            controller.enqueue(
-              encoder.encode(
-                `data: ${JSON.stringify({ type: "text.delta", text: delta.value })}\n\n`,
-              ),
-            );
+            const cleaned = stripCitations(delta.value, citationBuffer);
+            if (cleaned) {
+              controller.enqueue(
+                encoder.encode(
+                  `data: ${JSON.stringify({ type: "text.delta", text: cleaned })}\n\n`,
+                ),
+              );
+            }
           }
         });
 

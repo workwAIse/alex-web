@@ -22,6 +22,8 @@ type ProjectEntry = {
   impact: string;
   tasks: string;
   role: string;
+  /** Show the chat input for this project (one per company: EGYM Genius, Interhyp Home). */
+  showChat: boolean;
 };
 
 const PROJECT_ENTRIES: ProjectEntry[] = [
@@ -34,6 +36,7 @@ const PROJECT_ENTRIES: ProjectEntry[] = [
     tasks:
       "Led the whole development process from ideation to launch, including design sprint, rapid prototyping, cross-functional execution (tech, UX, research, sport science), rollout + post-launch optimization.",
     role: "Product Lead",
+    showChat: false,
   },
   {
     title: "Fitness Hub seca edition: Integrated BIA Assessments",
@@ -45,6 +48,7 @@ const PROJECT_ENTRIES: ProjectEntry[] = [
     tasks:
       "Owned the software product from concept to global launch, drove product/design/engineering decisions, cross-company coordination with seca, ensured readiness for key milestones (tradeshows, pilots, enterprise customers).",
     role: "Software Product Lead (EGYM side)",
+    showChat: false,
   },
   {
     title: "EGYM Genius: AI Training Plans",
@@ -56,6 +60,7 @@ const PROJECT_ENTRIES: ProjectEntry[] = [
     tasks:
       "Owned the end-to-end Fitness Hub experience, shaped holistic member journey across devices, ensured delivery across MVP/pilot/rollout.",
     role: "Contributing Product Manager (Fitness Hub)",
+    showChat: true,
   },
   {
     title: "Interhyp Home: New mortgage comparison product",
@@ -67,6 +72,7 @@ const PROJECT_ENTRIES: ProjectEntry[] = [
     tasks:
       "Took over the rebuild of core comparison product, translated the (new) platform strategy into quarterly planning + sprint execution, coordinated internal/external developers and UX designers, managed rollout strategy.",
     role: "Product Owner",
+    showChat: true,
   },
 ];
 
@@ -228,40 +234,42 @@ export default function ProjectsSection() {
                       </nav>
                     )}
 
-                    {/* Chat bar — input and send button separate, clean pill style */}
-                    <form
-                      className="mt-3 flex items-center gap-2"
-                      onSubmit={(e) => {
-                        e.preventDefault();
-                        if (!trimmedPrompt) return;
-                        setOpenChat({
-                          jobTitle: item.title,
-                          initialPrompt: trimmedPrompt,
-                        });
-                      }}
-                    >
-                      <input
-                        type="text"
-                        value={inputValue}
-                        onChange={(e) =>
-                          setPromptByProject((prev) => ({
-                            ...prev,
-                            [item.title]: e.target.value,
-                          }))
-                        }
-                        placeholder="Ask a follow-up..."
-                        className="min-w-0 flex-1 rounded-full bg-white py-2.5 pl-5 pr-4 text-sm text-[#171717] shadow-[0_1px_2px_rgba(0,0,0,0.06)] ring-1 ring-black/[0.06] placeholder:text-[#a3a3a3] outline-none focus:ring-2 focus:ring-black/10"
-                        aria-label={`Ask about ${item.title}`}
-                      />
-                      <button
-                        type="submit"
-                        disabled={!trimmedPrompt}
-                        className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-black text-white transition-opacity hover:opacity-90 disabled:opacity-30"
-                        aria-label="Open chat with this prompt"
+                    {/* Chat bar — only for EGYM Genius and Interhyp Home */}
+                    {item.showChat && (
+                      <form
+                        className="mt-3 flex items-center gap-2"
+                        onSubmit={(e) => {
+                          e.preventDefault();
+                          if (!trimmedPrompt) return;
+                          setOpenChat({
+                            jobTitle: item.title,
+                            initialPrompt: trimmedPrompt,
+                          });
+                        }}
                       >
-                        <ArrowRight className="h-4 w-4" aria-hidden />
-                      </button>
-                    </form>
+                        <input
+                          type="text"
+                          value={inputValue}
+                          onChange={(e) =>
+                            setPromptByProject((prev) => ({
+                              ...prev,
+                              [item.title]: e.target.value,
+                            }))
+                          }
+                          placeholder="Ask a follow-up..."
+                          className="min-w-0 flex-1 rounded-full bg-white py-2.5 pl-5 pr-4 text-sm text-[#171717] shadow-[0_1px_2px_rgba(0,0,0,0.06)] ring-1 ring-black/[0.06] placeholder:text-[#a3a3a3] outline-none focus:ring-2 focus:ring-black/10"
+                          aria-label={`Ask about ${item.title}`}
+                        />
+                        <button
+                          type="submit"
+                          disabled={!trimmedPrompt}
+                          className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-black text-white transition-opacity hover:opacity-90 disabled:opacity-30"
+                          aria-label="Open chat with this prompt"
+                        >
+                          <ArrowRight className="h-4 w-4" aria-hidden />
+                        </button>
+                      </form>
+                    )}
                   </div>
                 </li>
               );
