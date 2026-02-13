@@ -1,4 +1,4 @@
-import { render } from "@testing-library/react";
+import { act, render } from "@testing-library/react";
 import { describe, expect, it, vi } from "vitest";
 import Hero from "./Hero";
 
@@ -23,5 +23,34 @@ describe("Hero", () => {
       '[class*="bg-gradient-to-b"][aria-hidden]'
     );
     expect(gradient).toBeDefined();
+  });
+
+  it("scrolling down in hero starts the zoom and shows the laptop layer", () => {
+    Object.defineProperty(window, "scrollY", { value: 0, writable: true });
+    const { container } = render(<Hero />);
+    expect(container.querySelector('img[src*="Laptop"]')).toBeNull();
+
+    act(() => {
+      window.dispatchEvent(
+        new WheelEvent("wheel", { deltaY: 10, bubbles: true })
+      );
+    });
+
+    expect(container.querySelector('img[src*="Laptop"]')).not.toBeNull();
+  });
+
+  it("scroll is not triggered when wheel down starts zoom", () => {
+    Object.defineProperty(window, "scrollY", { value: 0, writable: true });
+    const scrollTo = vi.spyOn(window, "scrollTo").mockImplementation(() => {});
+
+    render(<Hero />);
+    act(() => {
+      window.dispatchEvent(
+        new WheelEvent("wheel", { deltaY: 10, bubbles: true })
+      );
+    });
+
+    expect(scrollTo).not.toHaveBeenCalled();
+    scrollTo.mockRestore();
   });
 });
