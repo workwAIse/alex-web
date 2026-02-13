@@ -15,10 +15,12 @@ interface Message {
 }
 
 interface ChatModalProps {
-  /** The job title that was clicked — drives the initial prompt. */
+  /** The job title that was clicked — drives the initial prompt when initialPrompt is not provided. */
   jobTitle: string;
   /** Called when the user closes the modal. */
   onClose: () => void;
+  /** Optional: use this as the first user message instead of "Tell me more about {jobTitle}". */
+  initialPrompt?: string | null;
 }
 
 /* ------------------------------------------------------------------ */
@@ -40,7 +42,7 @@ const AiAvatar = memo(function AiAvatar() {
 /* ------------------------------------------------------------------ */
 /*  Component                                                          */
 /* ------------------------------------------------------------------ */
-export default function ChatModal({ jobTitle, onClose }: ChatModalProps) {
+export default function ChatModal({ jobTitle, onClose, initialPrompt }: ChatModalProps) {
   const [messages, setMessages] = useState<Message[]>([]);
   const [threadId, setThreadId] = useState<string | null>(null);
   const [input, setInput] = useState("");
@@ -200,8 +202,10 @@ export default function ChatModal({ jobTitle, onClose }: ChatModalProps) {
   useEffect(() => {
     if (hasSentInitial.current) return;
     hasSentInitial.current = true;
-    sendMessage(`Tell me more about ${jobTitle}`);
-  }, [jobTitle, sendMessage]);
+    const message =
+      initialPrompt?.trim() || `Tell me more about ${jobTitle}`;
+    sendMessage(message);
+  }, [jobTitle, initialPrompt, sendMessage]);
 
   /* Handle form submit */
   const handleSubmit = (e: React.FormEvent) => {

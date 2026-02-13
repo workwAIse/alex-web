@@ -1,5 +1,6 @@
 "use client";
 
+import { getLogoUrl } from "@/lib/logo";
 import { Marquee } from "@/components/ui/marquee";
 
 /**
@@ -29,22 +30,6 @@ export const MARQUEE_COMPANIES: {
 ];
 
 const LOGO_SIZE = 40;
-/** PNG for transparency support (Logo.dev returns transparent logos when available). */
-const LOGO_FORMAT = "png" as const;
-
-function getLogoUrl(domain: string): string | null {
-  const token =
-    typeof process !== "undefined" &&
-    process.env.NEXT_PUBLIC_LOGO_DEV_PUBLISHABLE_KEY?.trim();
-  if (!token) return null;
-  const params = new URLSearchParams({
-    token,
-    size: String(LOGO_SIZE),
-    format: LOGO_FORMAT,
-    theme: "light",
-  });
-  return `https://img.logo.dev/${encodeURIComponent(domain)}?${params.toString()}`;
-}
 
 function MarqueeSlot({
   name,
@@ -55,7 +40,7 @@ function MarqueeSlot({
   domain?: string;
   logoSrc?: string;
 }) {
-  const logoUrl = logoSrc ?? (domain ? getLogoUrl(domain) : null);
+  const logoUrl = logoSrc ?? (domain ? getLogoUrl(domain, LOGO_SIZE) : null);
 
   if (!logoUrl) return null;
 

@@ -55,7 +55,7 @@ describe("ChatModal", () => {
     expect(screen.getByText("alexb-ai.vercel.app")).toBeDefined();
   });
 
-  it("auto-sends the initial prompt on mount", () => {
+  it("auto-sends the default prompt on mount when initialPrompt is not provided", () => {
     mockFetch.mockResolvedValue({
       ok: true,
       json: () =>
@@ -72,12 +72,40 @@ describe("ChatModal", () => {
       screen.getByText("Tell me more about Senior Engineer — Company A"),
     ).toBeDefined();
 
-    // Fetch should have been called with the initial prompt
+    // Fetch should have been called with the default prompt
     expect(mockFetch).toHaveBeenCalledWith("/api/chat", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({
         message: "Tell me more about Senior Engineer — Company A",
+        threadId: null,
+      }),
+    });
+  });
+
+  it("auto-sends initialPrompt when provided", () => {
+    mockFetch.mockResolvedValue({
+      ok: true,
+      json: () =>
+        Promise.resolve({
+          response: "Some response",
+          threadId: "thread_123",
+        }),
+    });
+
+    render(
+      <ChatModal
+        {...defaultProps}
+        initialPrompt="What was the tech stack for this project?"
+      />,
+    );
+
+    expect(screen.getByText("What was the tech stack for this project?")).toBeDefined();
+    expect(mockFetch).toHaveBeenCalledWith("/api/chat", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({
+        message: "What was the tech stack for this project?",
         threadId: null,
       }),
     });

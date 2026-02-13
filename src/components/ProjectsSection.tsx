@@ -1,38 +1,78 @@
 "use client";
 
 import { useState } from "react";
-import Lottie from "lottie-react";
-import messageIconAnimation from "../../public/Interactive Digital Assistant.json";
+import { ArrowRight, FolderHeart, FolderOpen, SquareArrowOutUpRight } from "lucide-react";
+import { getLogoUrl } from "@/lib/logo";
 import ChatModal from "./ChatModal";
 
 /**
  * Projects section — ChatGPT projects UI style.
  * Clean, minimalist, white canvas; prominent title, list with title/description/date.
  */
-const FOLDER_ICON = (
-  <svg
-    xmlns="http://www.w3.org/2000/svg"
-    width="20"
-    height="20"
-    viewBox="0 0 24 24"
-    fill="none"
-    stroke="currentColor"
-    strokeWidth="1.5"
-    strokeLinecap="round"
-    strokeLinejoin="round"
-    aria-hidden
-  >
-    <path d="M20 20a2 2 0 0 0 2-2V8a2 2 0 0 0-2-2h-7.9a2 2 0 0 1-1.69-.9L9.6 3.9A2 2 0 0 0 7.93 3H4a2 2 0 0 0-2 2v13a2 2 0 0 0 2 2Z" />
-  </svg>
-);
+const COMPANY_LOGO: Record<"egym" | "interhyp", { domain: string; name: string }> = {
+  egym: { domain: "egym.com", name: "EGYM" },
+  interhyp: { domain: "interhyp.de", name: "Interhyp" },
+};
 
-const PLACEHOLDER_ENTRIES = [
-  { title: "Senior Engineer — Company A", description: "Led platform architecture and delivery.", date: "Feb 8" },
-  { title: "Tech Lead — Company B", description: "Shipped mobile and web products.", date: "Jan 12" },
+type ProjectEntry = {
+  title: string;
+  company: "egym" | "interhyp";
+  defaultPrompt: string;
+  outcome: string;
+  impact: string;
+  tasks: string;
+  role: string;
+};
+
+const PROJECT_ENTRIES: ProjectEntry[] = [
+  {
+    title: "EGYM Squat Test: AI Mobility Assessment",
+    company: "egym",
+    defaultPrompt: "Tell Me More About Alex Time at EGYM",
+    outcome: "Delivered a premium onboarding assessment and unlock actionable mobility insights using 3D body analysis.",
+    impact: "Reduced flexibility test time 5 min → 20 sec; doubled flexibility test retention",
+    tasks:
+      "Led the whole development process from ideation to launch, including design sprint, rapid prototyping, cross-functional execution (tech, UX, research, sport science), rollout + post-launch optimization.",
+    role: "Product Lead",
+  },
+  {
+    title: "Fitness Hub seca edition: Integrated BIA Assessments",
+    company: "egym",
+    defaultPrompt: "Tell Me More About Alex Time at EGYM",
+    outcome: "Launched a new product that combines best in class onboarding with medical-grade body composition analysis.",
+    impact:
+      "Successfully shipped a partner-integrated innovation product to global markets; enabled large-scale pilots and GTM execution with enterprise customers.",
+    tasks:
+      "Owned the software product from concept to global launch, drove product/design/engineering decisions, cross-company coordination with seca, ensured readiness for key milestones (tradeshows, pilots, enterprise customers).",
+    role: "Software Product Lead (EGYM side)",
+  },
+  {
+    title: "EGYM Genius: AI Training Plans",
+    company: "egym",
+    defaultPrompt: "Tell Me More About Alex Time at EGYM",
+    outcome: "Democratized personal training experiences by enabling fast, AI-powered training plan creation at scale.",
+    impact:
+      "Reduced plan creation time 60 min → 20 min; increased Fitness Hub NPS 4.0 → 4.2; ensured great launch success in time for the 2024 tradeshows",
+    tasks:
+      "Owned the end-to-end Fitness Hub experience, shaped holistic member journey across devices, ensured delivery across MVP/pilot/rollout.",
+    role: "Contributing Product Manager (Fitness Hub)",
+  },
+  {
+    title: "Interhyp Home: New mortgage comparison product",
+    company: "interhyp",
+    defaultPrompt: "Tell Me More About Alex Time at Interhyp",
+    outcome: "Modernized a core part of the interhyp platform (the mortgage comparison engine) to be used by both professional advisors and end customers.",
+    impact:
+      "Rolled out the new product to 10,000+ professional users, supporting the readiness for €10B+ annual volume through the platform.",
+    tasks:
+      "Took over the rebuild of core comparison product, translated the (new) platform strategy into quarterly planning + sprint execution, coordinated internal/external developers and UX designers, managed rollout strategy.",
+    role: "Product Owner",
+  },
 ];
 
 export default function ProjectsSection() {
-  const [activeJob, setActiveJob] = useState<string | null>(null);
+  const [promptByProject, setPromptByProject] = useState<Record<string, string>>({});
+  const [openChat, setOpenChat] = useState<{ jobTitle: string; initialPrompt: string } | null>(null);
 
   return (
     <>
@@ -45,63 +85,198 @@ export default function ProjectsSection() {
           {/* Header: title */}
           <header className="flex flex-wrap items-center justify-between gap-4">
             <div className="flex items-center gap-3">
-              <span className="text-[#6e6e80]" aria-hidden>
-                {FOLDER_ICON}
-              </span>
+              <FolderHeart
+                className="h-9 w-9 shrink-0 text-[#171717] md:h-12 md:w-12"
+                aria-hidden
+              />
               <h2 className="text-4xl font-semibold tracking-tight text-[#171717] md:text-5xl">
                 Projects
               </h2>
             </div>
           </header>
 
-          {/* List: title, description, date — generous spacing, no dividers */}
-          <ul className="mt-12 space-y-10">
-            {PLACEHOLDER_ENTRIES.map((item, i) => (
-              <li key={i} className="group">
-                <div className="flex flex-col gap-1 sm:flex-row sm:items-baseline sm:justify-between">
-                  <div className="flex-1">
-                    <h3 className="text-lg font-semibold leading-snug text-[#171717] md:text-xl">
-                      {item.title}
-                    </h3>
-                    <p className="mt-0.5 text-base leading-relaxed text-[#6e6e80]">
-                      {item.description}
-                    </p>
-                  </div>
-                  <div className="mt-1 flex shrink-0 items-center gap-3 sm:mt-0 sm:ml-4">
-                    <span className="text-sm text-[#6e6e80]">
-                      {item.date}
-                    </span>
-                    <button
-                      onClick={() => setActiveJob(item.title)}
-                      className="inline-flex items-center justify-center rounded-md p-1.5 text-[#6e6e80] transition-colors hover:bg-[#f0f0f0] hover:text-[#171717]"
-                      aria-label={`Chat about ${item.title}`}
-                      title="Ask about this role"
+          {/* List: case studies with Goal, Role, Key work, Impact + chat bar */}
+          <ul className="mt-12 space-y-12">
+            {PROJECT_ENTRIES.map((item, i) => {
+              const inputValue =
+                promptByProject[item.title] ?? item.defaultPrompt;
+              const trimmedPrompt = inputValue.trim();
+
+              return (
+                <li key={i} className="group">
+                  <div className="flex flex-col gap-4">
+                    <div className="flex-1 min-w-0">
+                      <h3 className="flex flex-wrap items-center gap-2 text-lg font-semibold leading-snug text-[#171717] md:text-xl">
+                        <FolderOpen
+                          className="h-5 w-5 shrink-0 text-[#171717] md:h-6 md:w-6"
+                          aria-hidden
+                        />
+                        <img
+                          src={getLogoUrl(COMPANY_LOGO[item.company].domain, 24)}
+                          alt={COMPANY_LOGO[item.company].name}
+                          width={24}
+                          height={24}
+                          className="h-5 w-5 shrink-0 object-contain md:h-6 md:w-6"
+                          loading="lazy"
+                          title={COMPANY_LOGO[item.company].name}
+                        />
+                        <span className="min-w-0 flex-1">{item.title}</span>
+                      </h3>
+                      <dl className="mt-3 space-y-2 text-sm md:text-base">
+                        <div>
+                          <dt className="sr-only">Outcome</dt>
+                          <dd className="font-semibold text-[#171717]">Outcome:</dd>
+                          <dd className="mt-0.5 leading-relaxed text-[#6e6e80]">{item.outcome}</dd>
+                        </div>
+                        <div>
+                          <dt className="sr-only">Impact</dt>
+                          <dd className="font-semibold text-[#171717]">Impact:</dd>
+                          <dd className="mt-0.5 leading-relaxed text-[#6e6e80]">{item.impact}</dd>
+                        </div>
+                        <div>
+                          <dt className="sr-only">Tasks</dt>
+                          <dd className="font-semibold text-[#171717]">Tasks:</dd>
+                          <dd className="mt-0.5 leading-relaxed text-[#6e6e80]">{item.tasks}</dd>
+                        </div>
+                        <div>
+                          <dt className="sr-only">Role</dt>
+                          <dd className="font-semibold text-[#171717]">Role:</dd>
+                          <dd className="mt-0.5 leading-relaxed text-[#6e6e80]">{item.role}</dd>
+                        </div>
+                      </dl>
+                    </div>
+
+                    {/* Squat Test: external links (article + video) before prompt */}
+                    {item.title === "EGYM Squat Test: AI Mobility Assessment" && (
+                      <nav className="flex items-center gap-3" aria-label="Squat Test links">
+                        <a
+                          href="https://athletechnews.com/egym-adds-layer-personalization-connectivity-squat-flexibility-test/"
+                          target="_blank"
+                          rel="noopener noreferrer"
+                          className="inline-flex items-center gap-1.5 text-sm text-[#6e6e80] transition-colors hover:text-[#171717]"
+                          aria-label="Read article on Athletech News (opens in new tab)"
+                        >
+                          <SquareArrowOutUpRight className="h-4 w-4 shrink-0" aria-hidden />
+                          <span>Article</span>
+                        </a>
+                        <a
+                          href="https://www.youtube.com/watch?v=5D5Ic5IiLEg"
+                          target="_blank"
+                          rel="noopener noreferrer"
+                          className="inline-flex items-center gap-1.5 text-sm text-[#6e6e80] transition-colors hover:text-[#171717]"
+                          aria-label="Watch on YouTube (opens in new tab)"
+                        >
+                          <img
+                            src={getLogoUrl("youtube.com", 20)}
+                            alt=""
+                            width={20}
+                            height={20}
+                            className="h-5 w-5 shrink-0 object-contain"
+                            loading="lazy"
+                          />
+                          <span>YouTube</span>
+                        </a>
+                      </nav>
+                    )}
+
+                    {/* EGYM Genius: article + YouTube before prompt */}
+                    {item.title === "EGYM Genius: AI Training Plans" && (
+                      <nav className="flex items-center gap-3" aria-label="EGYM Genius links">
+                        <a
+                          href="https://insider.fitt.co/egyms-powering-the-smart-gym-revolution/"
+                          target="_blank"
+                          rel="noopener noreferrer"
+                          className="inline-flex items-center gap-1.5 text-sm text-[#6e6e80] transition-colors hover:text-[#171717]"
+                          aria-label="Read article on Fitt Insider (opens in new tab)"
+                        >
+                          <SquareArrowOutUpRight className="h-4 w-4 shrink-0" aria-hidden />
+                          <span>Article</span>
+                        </a>
+                        <a
+                          href="https://www.youtube.com/watch?v=_A7KxQgK5VQ"
+                          target="_blank"
+                          rel="noopener noreferrer"
+                          className="inline-flex items-center gap-1.5 text-sm text-[#6e6e80] transition-colors hover:text-[#171717]"
+                          aria-label="Watch on YouTube (opens in new tab)"
+                        >
+                          <img
+                            src={getLogoUrl("youtube.com", 20)}
+                            alt=""
+                            width={20}
+                            height={20}
+                            className="h-5 w-5 shrink-0 object-contain"
+                            loading="lazy"
+                          />
+                          <span>YouTube</span>
+                        </a>
+                      </nav>
+                    )}
+
+                    {/* Fitness Hub seca edition: article link before prompt */}
+                    {item.title === "Fitness Hub seca edition: Integrated BIA Assessments" && (
+                      <nav className="flex items-center gap-3" aria-label="Fitness Hub seca edition links">
+                        <a
+                          href="https://www.fitnessmanagement.de/egym-fitness-hub-seca-edition/"
+                          target="_blank"
+                          rel="noopener noreferrer"
+                          className="inline-flex items-center gap-1.5 text-sm text-[#6e6e80] transition-colors hover:text-[#171717]"
+                          aria-label="Read article on fitness MANAGEMENT (opens in new tab)"
+                        >
+                          <SquareArrowOutUpRight className="h-4 w-4 shrink-0" aria-hidden />
+                          <span>Article</span>
+                        </a>
+                      </nav>
+                    )}
+
+                    {/* Chat bar — input and send button separate, clean pill style */}
+                    <form
+                      className="mt-3 flex items-center gap-2"
+                      onSubmit={(e) => {
+                        e.preventDefault();
+                        if (!trimmedPrompt) return;
+                        setOpenChat({
+                          jobTitle: item.title,
+                          initialPrompt: trimmedPrompt,
+                        });
+                      }}
                     >
-                      <Lottie
-                        animationData={messageIconAnimation}
-                        loop
-                        autoplay
-                        style={{ width: 60, height: 60 }}
+                      <input
+                        type="text"
+                        value={inputValue}
+                        onChange={(e) =>
+                          setPromptByProject((prev) => ({
+                            ...prev,
+                            [item.title]: e.target.value,
+                          }))
+                        }
+                        placeholder="Ask a follow-up..."
+                        className="min-w-0 flex-1 rounded-full bg-white py-2.5 pl-5 pr-4 text-sm text-[#171717] shadow-[0_1px_2px_rgba(0,0,0,0.06)] ring-1 ring-black/[0.06] placeholder:text-[#a3a3a3] outline-none focus:ring-2 focus:ring-black/10"
+                        aria-label={`Ask about ${item.title}`}
                       />
-                    </button>
+                      <button
+                        type="submit"
+                        disabled={!trimmedPrompt}
+                        className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-black text-white transition-opacity hover:opacity-90 disabled:opacity-30"
+                        aria-label="Open chat with this prompt"
+                      >
+                        <ArrowRight className="h-4 w-4" aria-hidden />
+                      </button>
+                    </form>
                   </div>
-                </div>
-              </li>
-            ))}
+                </li>
+              );
+            })}
           </ul>
 
-          {/* Footer disclaimer — subtle */}
-          <p className="mt-16 text-center text-xs text-[#a3a3a3]">
-            Work experience. Replace placeholder entries with your real projects.
-          </p>
         </div>
       </section>
 
-      {/* Chat overlay */}
-      {activeJob && (
+      {/* Chat overlay — opened with the prompt from the project's input */}
+      {openChat && (
         <ChatModal
-          jobTitle={activeJob}
-          onClose={() => setActiveJob(null)}
+          jobTitle={openChat.jobTitle}
+          initialPrompt={openChat.initialPrompt}
+          onClose={() => setOpenChat(null)}
         />
       )}
     </>
