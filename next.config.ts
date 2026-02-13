@@ -8,6 +8,8 @@ const nextConfig: NextConfig = {
         hostname: "www.gstatic.com",
         pathname: "/lamda/images/**",
       },
+      { protocol: "https", hostname: "logo.clearbit.com", pathname: "/**" },
+      { protocol: "https", hostname: "img.logo.dev", pathname: "/**" },
     ],
   },
 };

@@ -11,7 +11,7 @@ import ChatModal from "./ChatModal";
  */
 const COMPANY_LOGO: Record<"egym" | "interhyp", { domain: string; name: string }> = {
   egym: { domain: "egym.com", name: "EGYM" },
-  interhyp: { domain: "interhyp.de", name: "Interhyp" },
+  interhyp: { domain: "interhyp-gruppe.de", name: "Interhyp Gruppe" },
 };
 
 type ProjectEntry = {
