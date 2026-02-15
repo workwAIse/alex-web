@@ -10,15 +10,35 @@ describe("Footer", () => {
     expect(footer?.getAttribute("aria-label")).toBe("Site footer");
   });
 
-  it("renders footer navigation links", () => {
+  it("renders craft message and key phrases", () => {
     render(<Footer />);
-    const nav = screen.getByRole("navigation", { name: /footer navigation/i });
-    expect(nav).toBeDefined();
-    expect(screen.getByRole("link", { name: /top/i })).toBeDefined();
-    expect(screen.getByRole("link", { name: /projects/i })).toBeDefined();
-    expect(screen.getByRole("link", { name: /skills/i })).toBeDefined();
-    expect(screen.getByRole("link", { name: /code/i })).toBeDefined();
-    expect(screen.getByRole("link", { name: /gems/i })).toBeDefined();
+    expect(screen.getByText(/Happy that you came this far/i)).toBeDefined();
+    expect(screen.getByText(/craft of digital products/i)).toBeDefined();
+    expect(screen.getByText(/Shipping value fast/i)).toBeDefined();
+  });
+
+  it("renders Get in contact and LinkedIn link", () => {
+    render(<Footer />);
+    expect(screen.getByText("Get in contact")).toBeDefined();
+    const linkedInLink = screen.getByRole("link", { name: /Alex Büchel on LinkedIn/i });
+    expect(linkedInLink).toBeDefined();
+    expect(linkedInLink.getAttribute("href")).toMatch(/linkedin\.com/);
+    expect(linkedInLink.getAttribute("target")).toBe("_blank");
+  });
+
+  it("renders dachshund image and funny footer message", () => {
+    render(<Footer />);
+    const img = screen.getByRole("img", { name: /Dachshund enjoying a meal/i });
+    expect(img).toBeDefined();
+    expect(screen.getByText(/Leave me alone with my footer/i)).toBeDefined();
+  });
+
+  it("renders copyright and Impressum link on the right", () => {
+    render(<Footer />);
+    expect(screen.getByText(/All rights reserved/i)).toBeDefined();
+    const impressumLink = screen.getByRole("link", { name: /Impressum/i });
+    expect(impressumLink).toBeDefined();
+    expect(impressumLink.getAttribute("href")).toBe("/impressum");
   });
 
   it("renders current year in copyright", () => {
