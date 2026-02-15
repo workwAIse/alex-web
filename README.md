@@ -53,7 +53,7 @@ The homepage includes five product-themed sections plus a Referrals section (pla
 | ----------- | ------- | --------- | -------- |
 | `#projects` | OpenAI  | Projects  | Work experience: four case studies (Squat Test, EGYM Genius, Fitness Hub seca edition, Mortgage Comparison Engine Rebuild) with Goal, My role, Key work, Impact; AI chat per project |
 | `#skills`   | Claude  | Skills    | My skills (with logo marquee at bottom) |
-| `#code`     | Cursor  | Code      | Hobby projects  |
+| `#code`     | Cursor  | Code      | Hobby projects in a Cursor IDE–style view: syntax-highlighted `hobby-projects.ts`, link row (“Open: workwAIse · …”). **Easter egg:** click **Run** in the menu bar to “build” and see the built view inside a single Mac-like browser window (localhost chrome): a **Gallery4** carousel of the four hobby project cards (image, title, description, “Read more”); **View Source** returns to the code view. |
 | `#gems`     | Gemini  | Gems      | Private stuff   |
 | `#referrals`| —       | Referrals | What people say (anonymized referral quotes) |
 
@@ -101,6 +101,14 @@ Reusable UI primitives live in **`src/components/ui/`**. This folder follows the
 - **`src/components/ui/marquee.tsx`** – Horizontal marquee (infinite scroll). Used by `MarqueeDemo` at the bottom of the Skills (Claude) section for a logo strip; supports `direction`, `speed`, and `pauseOnHover`. Custom animation is defined in `globals.css` (`@theme`).
 - **`src/components/ui/marquee-demo.tsx`** – Renders the Skills section logo strip via [Logo.dev](https://logo.dev) (logos only). Edit **`MARQUEE_COMPANIES`** to change entries; use `domain` for Logo.dev or `logoSrc` for local assets (e.g. Claude, Gemini use section cursor icons). Set **`NEXT_PUBLIC_LOGO_DEV_PUBLISHABLE_KEY`** in `.env.local` for Logo.dev logos.
 - **`src/lib/utils.ts`** – `cn()` helper for merging Tailwind classes (used by UI components).
+- **`src/components/ui/compare.tsx`** – Compare (image before/after slider) and CompareContent; optional for other uses (Code section uses Run / View Source toggle instead).
+- **`src/components/ui/button.tsx`** – **Button**: shadcn-style button (variants: default, ghost, outline, etc.). Used by Carousel and Gallery4.
+- **`src/components/ui/carousel.tsx`** – **Carousel**: Embla-based carousel (CarouselContent, CarouselItem, setApi). Used by Gallery4.
+- **`src/components/ui/gallery4.tsx`** – **Gallery4**: horizontal carousel of cards (image, gradient overlay, title, description, “Read more”). Used in the Code section’s “built” view inside the Mac browser frame; accepts `items` (Gallery4Item[]), optional `title`, `description`, and `action` (e.g. View Source button).
+- **`src/components/ui/background-gradient.tsx`** – **BackgroundGradient**: animated gradient border (Framer Motion). Available for other uses.
+- **`src/components/ui/spotlight-card.tsx`** – **GlowCard**: cursor-follow spotlight glow card (available for other uses).
+- **`src/components/ui/sparkles.tsx`** – **SparklesCore** (tsparticles). Used by the Compare component for the slider handle sparkles.
+- **`src/data/hobby-projects.ts`** – Data for the Code section: four hobby projects (title, link, description, tech, details; optional `previewImageUrl` for card images).
 
 ### Marquee logos (Logo.dev)
 

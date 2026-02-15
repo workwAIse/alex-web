@@ -17,6 +17,22 @@
   --background: #ffffff;
   --foreground: #171717;
   --muted: #f4f4f5;
+  /* shadcn-style tokens for Button, Carousel, Gallery4 */
+  --primary: 60 2% 8%;
+  --primary-foreground: 0 0% 98%;
+  --ring: 60 2% 8%;
+  --ring-offset: 255 255 255;
+  --input: 0 0% 90%;
+  --border: 0 0% 90%;
+  --accent: 0 0% 96%;
+  --accent-foreground: 60 2% 8%;
+  --secondary: 0 0% 96%;
+  --secondary-foreground: 60 2% 8%;
+  --destructive: 0 84% 60%;
+  --destructive-foreground: 0 0% 98%;
+  --card: #ffffff;
+  --card-foreground: #171717;
+  --muted-foreground: 0 0% 45%;
   /* Aurora background (aurora-background.tsx) */
   --white: #ffffff;
   --black: #000000;
@@ -34,13 +50,33 @@
   --footer-fg: #ededed;
   --sky-400: #38bdf8;
   --sky-500: #0ea5e9;
+  /* RainbowButton */
+  --color-1: 0 100% 63%;
+  --color-2: 270 100% 63%;
+  --color-3: 210 100% 63%;
+  --color-4: 195 100% 63%;
+  --color-5: 90 100% 63%;
+  --speed: 2s;
 }
 
 @theme inline {
   --color-background: var(--background);
   --color-foreground: var(--foreground);
   --color-muted: var(--muted);
-  --color-primary: #141413;
+  --color-primary: hsl(var(--primary));
+  --color-primary-foreground: hsl(var(--primary-foreground));
+  --color-ring: hsl(var(--ring));
+  --color-input: hsl(var(--input));
+  --color-border: hsl(var(--border));
+  --color-accent: hsl(var(--accent));
+  --color-accent-foreground: hsl(var(--accent-foreground));
+  --color-secondary: hsl(var(--secondary));
+  --color-secondary-foreground: hsl(var(--secondary-foreground));
+  --color-destructive: hsl(var(--destructive));
+  --color-destructive-foreground: hsl(var(--destructive-foreground));
+  --color-card: var(--card);
+  --color-card-foreground: var(--card-foreground);
+  --color-muted-foreground: hsl(var(--muted-foreground));
   --font-sans: var(--font-geist-sans);
   --font-mono: var(--font-geist-mono);
   --font-poppins: var(--font-poppins);
@@ -55,6 +91,7 @@
   --animate-marquee: marquee var(--duration, 30s) linear infinite;
   --animate-marquee-reverse: marquee var(--duration, 30s) linear reverse infinite;
   --animate-aurora: aurora 60s linear infinite;
+  --animate-rainbow: rainbow var(--speed, 2s) infinite linear;
   @keyframes marquee {
     to {
       transform: translateX(-50%);
@@ -66,6 +103,14 @@
     }
     to {
       background-position: 350% 50%, 350% 50%;
+    }
+  }
+  @keyframes rainbow {
+    0% {
+      background-position: 0%;
+    }
+    100% {
+      background-position: 200%;
     }
   }
 }
@@ -116,6 +161,18 @@ body {
   }
   75% {
     transform: rotate(-15deg);
+  }
+}
+
+/* Code section terminal: pulsing pipe cursor */
+@keyframes terminal-cursor {
+  0%,
+  50% {
+    opacity: 1;
+  }
+  51%,
+  100% {
+    opacity: 0;
   }
 }
 
