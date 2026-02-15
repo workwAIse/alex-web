@@ -1,119 +1,184 @@
 "use client";
 
-import Image from "next/image";
+import { useState, useRef, useEffect } from "react";
+import {
+  Activity,
+  BookOpen,
+  Code2,
+  MapPin,
+  Mic,
+  MoreVertical,
+  Search,
+  Sparkles,
+  Star,
+  Users,
+} from "lucide-react";
+import type { LucideIcon } from "lucide-react";
+import gemsData, { type Gem, type GemIconName } from "@/data/gems";
 
 /**
- * Gems section — Gemini (gemini.google.com) UI match.
- * Colors: main bg #f1f3f4 (Gemini light), text #202124 / #5f6368, surfaces #fff / #e8eaed, border #dadce0.
- * Typography: Roboto (Google-style sans). Uses official Gemini sparkle icon.
+ * Gems section — Google Gem Manager–style grid.
+ * Matches Gemini UI: icon on its own line, three-dots overflow menu, Material surface colors.
+ * Section bg #e8eaed, cards #fff, border #dadce0, elevation shadow.
  */
 
-const GEMINI_SPARKLE_URL =
-  "https://www.gstatic.com/lamda/images/gemini_sparkle_aurora_33f86dc0c0257da337c63.svg";
+const ICON_MAP: Record<GemIconName, LucideIcon> = {
+  sparkles: Sparkles,
+  "code-2": Code2,
+  activity: Activity,
+  "book-open": BookOpen,
+  users: Users,
+  "map-pin": MapPin,
+  search: Search,
+  mic: Mic,
+};
 
-const GEM_CHIPS = ["Gem 1", "Gem 2", "Gem 3", "Gem 4"];
+function GemCard({
+  gem,
+  menuOpen,
+  onMenuToggle,
+  onMenuClose,
+}: {
+  gem: Gem;
+  menuOpen: boolean;
+  onMenuToggle: () => void;
+  onMenuClose: () => void;
+}) {
+  const IconComponent = ICON_MAP[gem.icon];
+  const menuRef = useRef<HTMLDivElement>(null);
+
+  useEffect(() => {
+    if (!menuOpen) return;
+    const handleClickOutside = (e: MouseEvent) => {
+      if (menuRef.current && !menuRef.current.contains(e.target as Node)) {
+        onMenuClose();
+      }
+    };
+    document.addEventListener("mousedown", handleClickOutside);
+    return () => document.removeEventListener("mousedown", handleClickOutside);
+  }, [menuOpen, onMenuClose]);
+
+  return (
+    <article
+      className="relative min-h-[7.5rem] rounded-2xl border border-[#dadce0] bg-white p-5"
+      style={{
+        boxShadow:
+          "0 1px 2px 0 rgba(60,64,67,.3), 0 1px 3px 1px rgba(60,64,67,.15)",
+      }}
+    >
+      {/* Top row: icon (left) + three-dots menu (right), Google layout */}
+      <div className="mb-3 flex items-start justify-between gap-2">
+        <span
+          className="inline-flex h-10 w-10 shrink-0 items-center justify-center rounded-full text-white"
+          style={{ backgroundColor: gem.iconColor }}
+          aria-hidden
+        >
+          {IconComponent && (
+            <IconComponent className="h-5 w-5" strokeWidth={2} />
+          )}
+        </span>
+        <div className="relative shrink-0" ref={menuRef}>
+          <button
+            type="button"
+            onClick={onMenuToggle}
+            className="rounded-full p-1 transition-colors hover:bg-black/5"
+            style={{ color: "#5f6368" }}
+            aria-label="More options"
+            aria-expanded={menuOpen}
+            aria-haspopup="menu"
+          >
+            <MoreVertical className="h-5 w-5" strokeWidth={2} />
+          </button>
+          {menuOpen && (
+            <div
+              className="absolute right-0 top-full z-10 mt-1 min-w-[140px] rounded-lg border border-[#dadce0] bg-white py-1 shadow-lg"
+              role="menu"
+            >
+              {gem.favoriteLink ? (
+                <a
+                  href={gem.favoriteLink}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="flex items-center gap-2 px-3 py-2 text-[13px] text-left transition-colors hover:bg-black/5"
+                  style={{ color: "#202124" }}
+                  role="menuitem"
+                  onClick={onMenuClose}
+                >
+                  <Star className="h-4 w-4 shrink-0" strokeWidth={2} />
+                  Current favorite
+                </a>
+              ) : (
+                <span
+                  className="flex items-center gap-2 px-3 py-2 text-[13px]"
+                  style={{ color: "#5f6368" }}
+                  role="menuitem"
+                >
+                  <Star className="h-4 w-4 shrink-0" strokeWidth={2} />
+                  Current favorite
+                </span>
+              )}
+            </div>
+          )}
+        </div>
+      </div>
+      <h3
+        className="text-[15px] font-medium leading-snug tracking-tight"
+        style={{ color: "#202124" }}
+      >
+        {gem.title}
+      </h3>
+      <p
+        className="mt-1.5 text-[13px] leading-[1.45]"
+        style={{ color: "#5f6368" }}
+      >
+        {gem.shortDescription}
+      </p>
+    </article>
+  );
+}
 
 export default function GemsSection() {
+  const [openMenuId, setOpenMenuId] = useState<string | null>(null);
+
   return (
     <section
       id="gems"
-      className="relative w-full pt-16 pb-0 px-6 md:pt-24 md:pb-0 md:px-8"
+      className="relative w-full px-6 pt-16 pb-16 md:px-8 md:pt-24 md:pb-24"
       style={{
-        backgroundColor: "#f1f3f4",
+        backgroundColor: "#e8eaed",
         color: "#202124",
         fontFamily: "var(--font-roboto), Roboto, sans-serif",
       }}
     >
-      <div className="mx-auto max-w-3xl">
-        {/* Header: official Gemini sparkle + greeting (Gemini zero-state style) */}
-        <header className="flex flex-col items-center text-center">
-          <Image
-            src={GEMINI_SPARKLE_URL}
-            alt=""
-            width={32}
-            height={32}
-            className="mb-3 shrink-0"
-            aria-hidden
-            unoptimized
-          />
-          <h2 className="sr-only">Gems</h2>
-          <p
-            className="text-base font-normal"
-            style={{ color: "#202124" }}
+      <div className="mx-auto max-w-5xl">
+        <header>
+          <h2
+            className="text-[22px] font-normal tracking-tight md:text-[28px]"
+            style={{ color: "#202124", letterSpacing: "-0.02em" }}
           >
-            Hi there
-          </p>
+            Private Gems
+          </h2>
           <p
-            className="mt-1 text-[28px] font-bold leading-tight tracking-tight md:text-[32px]"
-            style={{ color: "#202124" }}
+            className="mt-0.5 text-[14px] font-normal"
+            style={{ color: "#5f6368" }}
           >
-            Where should we start?
+            Learn a bit about me besides (and maybe within) work
           </p>
         </header>
 
-        {/* Prompt card — pure white, barely visible border (Gemini input area) */}
-        <div
-          className="mt-10 rounded-[28px] border px-5 py-4 shadow-sm"
-          style={{
-            backgroundColor: "#ffffff",
-            borderColor: "#dadce0",
-          }}
-          role="presentation"
-        >
-          <p
-            className="text-base"
-            style={{ color: "#5f6368" }}
-          >
-            Enter a prompt for Gemini
-          </p>
-          <div
-            className="mt-3 flex items-center justify-between gap-2 text-sm"
-            style={{ color: "#5f6368" }}
-          >
-            <span className="flex items-center gap-2">
-              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" aria-hidden>
-                <path d="M12 5v14" />
-                <path d="M5 12h14" />
-              </svg>
-              Tools
-            </span>
-            <span className="flex items-center gap-2">
-              Thinking
-              <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor" aria-hidden>
-                <path d="M7 10l5 5 5-5z" />
-              </svg>
-              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" aria-hidden>
-                <path d="M12 2a3 3 0 0 0-3 3v7a3 3 0 0 0 6 0V5a3 3 0 0 0-3-3Z" />
-                <path d="M19 10v2a7 7 0 0 1-14 0v-2" />
-              </svg>
-            </span>
-          </div>
-        </div>
-
-        {/* Suggestion chips — very light grey bg, subtle border (Write / Plan / Research / Learn style) */}
-        <div className="mt-8 flex flex-wrap justify-center gap-3">
-          {GEM_CHIPS.map((label, i) => (
-            <button
-              key={i}
-              type="button"
-              className="rounded-xl border px-4 py-3 text-left text-base font-normal transition-colors hover:bg-[#dadce0]/50"
-              style={{
-                backgroundColor: "#e8eaed",
-                borderColor: "#dadce0",
-                color: "#202124",
-              }}
-            >
-              {label}
-            </button>
+        <div className="mt-8 grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
+          {gemsData.map((gem) => (
+            <GemCard
+              key={gem.id}
+              gem={gem}
+              menuOpen={openMenuId === gem.id}
+              onMenuToggle={() =>
+                setOpenMenuId((id) => (id === gem.id ? null : gem.id))
+              }
+              onMenuClose={() => setOpenMenuId(null)}
+            />
           ))}
         </div>
-
-        <p
-          className="mt-10 text-center text-xs"
-          style={{ color: "#5f6368" }}
-        >
-          Private highlights. Replace with your own gems.
-        </p>
       </div>
     </section>
   );

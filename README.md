@@ -54,7 +54,7 @@ The homepage includes five product-themed sections plus a Referrals section (pla
 | `#projects` | OpenAI  | Projects  | Work experience: four case studies (Squat Test, EGYM Genius, Fitness Hub seca edition, Mortgage Comparison Engine Rebuild) with Goal, My role, Key work, Impact; AI chat per project |
 | `#skills`   | Claude  | Skills    | My skills (with logo marquee at bottom) |
 | `#code`     | Cursor  | Code      | Hobby projects in a Cursor IDE–style view: syntax-highlighted `hobby-projects.ts`, link row (“Open: workwAIse · …”). **Easter egg:** click **Run** in the menu bar to “build” and see the built view inside a single Mac-like browser window (localhost chrome): a **Gallery4** carousel of the four hobby project cards (image, title, description, “Read more”); **View Source** returns to the code view. |
-| `#gems`     | Gemini  | Gems      | Private stuff   |
+| `#gems`     | Gemini  | Gems      | Private Gems (headline), subheadline “Learn a bit about me besides (and maybe within) work”. Google Gem Manager–style grid with three-dots overflow menu per card; one item “Current favorite” (with star icon) (link out per gem, optional). Data in `src/data/gems.ts`. |
 | `#referrals`| —       | Referrals | What people say (anonymized referral quotes) |
 
 Each section uses brand-aligned colors, typography, and layout. Add your real copy and data in the corresponding components when ready. The Referrals section uses an **AuroraBackground** (animated aurora gradient from `src/components/ui/aurora-background.tsx`) and a scrolling testimonials-style layout (dummy profile icon and title only, no names). It is linked from the side nav with a Smile icon. The custom cursor is not changed over the Referrals section (normal cursor).
@@ -109,6 +109,7 @@ Reusable UI primitives live in **`src/components/ui/`**. This folder follows the
 - **`src/components/ui/spotlight-card.tsx`** – **GlowCard**: cursor-follow spotlight glow card (available for other uses).
 - **`src/components/ui/sparkles.tsx`** – **SparklesCore** (tsparticles). Used by the Compare component for the slider handle sparkles.
 - **`src/data/hobby-projects.ts`** – Data for the Code section: four hobby projects (title, link, description, tech, details; optional `previewImageUrl` for card images).
+- **`src/data/gems.ts`** – Data for the Gems section: eight personal gems (title, shortDescription, icon, iconColor, optional favoriteLink) for the Gem Manager–style grid; each card has a three-dots menu with “Current favorite” (star icon; links to favoriteLink when set).
 
 ### Marquee logos (Logo.dev)
 
