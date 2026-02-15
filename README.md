@@ -62,7 +62,7 @@ Each section uses brand-aligned colors, typography, and layout. Add your real co
 The end of the page uses a **sticky footer reveal** (inspired by [Dataleap.ai](https://dataleap.ai)): the main content has large rounded bottom corners and a subtle shadow. As you scroll past the last section, the footer (fixed behind the content) is revealed, as if the page lifts away. Implemented with:
 
 - **`StickyFooterReveal`** (`src/components/StickyFooterReveal.tsx`) – Wraps the whole page: main content in a rounded wrapper (`z-10`), a spacer (`min-height: 60vh`) for scroll room, and a **fixed** footer (`z-0`) at the bottom. No JavaScript; layout is responsive using `vh` and `clamp()` for corner radius.
-- **`Footer`** (`src/components/Footer.tsx`) – Footer content (links, copyright). Theming uses CSS variables `--footer-bg` and `--footer-fg` in `globals.css`; corner radius is `--footer-reveal-radius` (default `clamp(1.5rem, 5vw, 3rem)`). Tweak these in `globals.css` to change the look.
+- **`Footer`** (`src/components/Footer.tsx`) – Footer content in three zones: (1) left — short message about loving the craft of digital products (Montserrat, same as header); (2) center — “Get in contact” with LinkedIn logo (Lucide `Linkedin` icon, link from `NEXT_PUBLIC_LINKEDIN_URL` in `.env.local`, default `https://www.linkedin.com/in/alexander-büchel/`); (3) right — scaled dachshund image (`public/dachshund1.png`) and the line “Leave me alone with my footer.” Bottom row (right-aligned): copyright and clickable **Impressum** link to `/impressum`. Theming uses CSS variables `--footer-bg` and `--footer-fg` in `globals.css`; corner radius is `--footer-reveal-radius`. Tweak these in `globals.css` to change the look.
 
 ### Section-aware custom cursor
 
