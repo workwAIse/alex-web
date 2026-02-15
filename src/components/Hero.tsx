@@ -14,7 +14,7 @@ const UNICORN_SDK_URL =
 const ROTATE_INTERVAL_MS = 5000;
 
 /** Total zoom + white-blend duration. */
-const ZOOM_TOTAL_S = 1.6;
+const ZOOM_TOTAL_S = 1.4;
 /** Initial fade-in of the laptop overlay (black bg appears). */
 const OVERLAY_FADE_IN_S = 0.2;
 /** The white starts fading in this many seconds into the zoom. */
@@ -22,7 +22,7 @@ const WHITE_STARTS_AT_S = 0.8;
 /** White fade-in duration (overlaps with the tail end of the zoom). */
 const WHITE_FADE_IN_S = ZOOM_TOTAL_S - WHITE_STARTS_AT_S; // 0.8s
 /** How long the whole overlay takes to fade out, revealing the section. */
-const OVERLAY_FADE_OUT_S = 0.25;
+const OVERLAY_FADE_OUT_S = 0.01;
 /** Scale range — goes further than before so zoom continues during the white blend. */
 const LAPTOP_FINAL_SCALE = 3.2;
 /** Threshold for triggering the zoom when scrolling down (near top of page). */

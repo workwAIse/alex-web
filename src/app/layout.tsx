@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import { Archivo, Caveat, Geist, Geist_Mono, Lora, Montserrat, Oswald, Poppins, Roboto } from "next/font/google";
 import SectionCursorLoader from "@/components/SectionCursorLoader";
 import FluidMenuNav from "@/components/FluidMenuNav";
+import MobileWarning from "@/components/MobileWarning";
 import "@fontsource-variable/climate-crisis/year.css";
 import "./globals.css";
 
@@ -74,6 +75,7 @@ export default function RootLayout({
         {children}
         <SectionCursorLoader />
         <FluidMenuNav />
+        <MobileWarning />
       </body>
     </html>
   );
