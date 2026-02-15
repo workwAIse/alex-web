@@ -12,20 +12,36 @@ const UNICORN_SDK_URL =
   "https://cdn.jsdelivr.net/gh/hiunicornstudio/unicornstudio.js@v2.0.5/dist/unicornStudio.umd.js";
 
 const ROTATE_INTERVAL_MS = 5000;
-const ZOOM_DURATION_S = 1.2;
-const ZOOM_FADE_DURATION_S = 0.2;
-const LAPTOP_FINAL_SCALE = 2.5;
+
+/** Total zoom + white-blend duration. */
+const ZOOM_TOTAL_S = 1.4;
+/** Initial fade-in of the laptop overlay (black bg appears). */
+const OVERLAY_FADE_IN_S = 0.2;
+/** The white starts fading in this many seconds into the zoom. */
+const WHITE_STARTS_AT_S = 0.8;
+/** White fade-in duration (overlaps with the tail end of the zoom). */
+const WHITE_FADE_IN_S = ZOOM_TOTAL_S - WHITE_STARTS_AT_S; // 0.8s
+/** How long the whole overlay takes to fade out, revealing the section. */
+const OVERLAY_FADE_OUT_S = 0.01;
+/** Scale range — goes further than before so zoom continues during the white blend. */
+const LAPTOP_FINAL_SCALE = 3.2;
 /** Threshold for triggering the zoom when scrolling down (near top of page). */
 const HERO_SCROLL_TRIGGER_PX = 20;
 
 const LAPTOP_IMAGE_SRC = "/Laptop (1).png";
 
-type ZoomPhase = "idle" | "zooming" | "zoomed";
+/**
+ * idle     → user scrolls down → zooming
+ * zooming  → zoom + white blend complete → revealing (instant jump + fade-out)
+ * revealing → overlay faded out → done
+ * done     → user scrolls back up → idle
+ */
+type ZoomPhase = "idle" | "zooming" | "revealing" | "done";
 
 export default function Hero() {
   const [showScrollDown, setShowScrollDown] = useState(true);
   const [zoomPhase, setZoomPhase] = useState<ZoomPhase>("idle");
-  const autoScrollingRef = useRef(false);
+  const overlayRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
     const id = setInterval(() => {
@@ -34,16 +50,23 @@ export default function Hero() {
     return () => clearInterval(id);
   }, []);
 
+  /* Block scroll during the animation sequence. */
   useEffect(() => {
-    if (zoomPhase === "zoomed") return;
+    if (zoomPhase !== "zooming" && zoomPhase !== "revealing") return;
 
     const handleWheel = (e: WheelEvent) => {
-      // During the zoom animation, block all scroll
-      if (zoomPhase === "zooming") {
-        e.preventDefault();
-        return;
-      }
-      // In idle: only intercept scroll-down at the top to start the zoom
+      e.preventDefault();
+    };
+
+    window.addEventListener("wheel", handleWheel, { passive: false });
+    return () => window.removeEventListener("wheel", handleWheel);
+  }, [zoomPhase]);
+
+  /* In idle: intercept scroll-down at the top to start the zoom. */
+  useEffect(() => {
+    if (zoomPhase !== "idle") return;
+
+    const handleWheel = (e: WheelEvent) => {
       if (typeof window !== "undefined") {
         const atTop = window.scrollY <= HERO_SCROLL_TRIGGER_PX;
         const scrollingDown = e.deltaY > 0;
@@ -51,7 +74,6 @@ export default function Hero() {
           e.preventDefault();
           setZoomPhase("zooming");
         }
-        // Scroll-up and other scroll events pass through normally
       }
     };
 
@@ -59,14 +81,11 @@ export default function Hero() {
     return () => window.removeEventListener("wheel", handleWheel);
   }, [zoomPhase]);
 
-  /* Reset to idle (remove laptop overlay) when user scrolls back to the hero.
-     Skip while the programmatic auto-scroll to projects is still running. */
+  /* Reset to idle when user scrolls back into the hero area. */
   useEffect(() => {
-    if (zoomPhase !== "zoomed") return;
+    if (zoomPhase !== "done") return;
 
     const handleScroll = () => {
-      if (autoScrollingRef.current) return;
-      // Reset as soon as ~half the hero section comes back into view
       if (window.scrollY <= window.innerHeight * 0.5) {
         setZoomPhase("idle");
       }
@@ -76,41 +95,26 @@ export default function Hero() {
     return () => window.removeEventListener("scroll", handleScroll);
   }, [zoomPhase]);
 
-  const handleZoomComplete = useCallback(() => {
-    setZoomPhase("zoomed");
-    autoScrollingRef.current = true;
-
-    // Smooth-scroll to the projects section with a longer, custom-eased animation
+  /**
+   * White blend finished → instant-jump to projects, then start fade-out.
+   * The white overlay is fully opaque at this point so the jump is invisible.
+   */
+  const handleWhiteComplete = useCallback(() => {
+    if (zoomPhase !== "zooming") return;
     const nextSection = document.getElementById("projects");
-    if (!nextSection) {
-      autoScrollingRef.current = false;
-      return;
+    if (nextSection) {
+      const top = nextSection.getBoundingClientRect().top + window.scrollY;
+      window.scrollTo(0, top);
     }
+    setZoomPhase("revealing");
+  }, [zoomPhase]);
 
-    const start = window.scrollY;
-    const end = nextSection.getBoundingClientRect().top + start;
-    const distance = end - start;
-    const duration = 800; // ms
-    let startTime: number | null = null;
-
-    function easeInOutCubic(t: number) {
-      return t < 0.5 ? 4 * t * t * t : 1 - Math.pow(-2 * t + 2, 3) / 2;
-    }
-
-    function step(timestamp: number) {
-      if (startTime === null) startTime = timestamp;
-      const elapsed = timestamp - startTime;
-      const progress = Math.min(elapsed / duration, 1);
-      window.scrollTo(0, start + distance * easeInOutCubic(progress));
-      if (progress < 1) {
-        requestAnimationFrame(step);
-      } else {
-        autoScrollingRef.current = false;
-      }
-    }
-
-    requestAnimationFrame(step);
+  /** Overlay fade-out complete → done, overlay unmounts. */
+  const handleRevealComplete = useCallback(() => {
+    setZoomPhase("done");
   }, []);
+
+  const isAnimating = zoomPhase === "zooming" || zoomPhase === "revealing";
 
   return (
     <section className="relative flex min-h-screen w-full flex-col items-center justify-center overflow-hidden">
@@ -136,25 +140,33 @@ export default function Hero() {
         aria-hidden
       />
 
-      {/* Laptop zoom overlay: full viewport, black bg, image scales from fit to laptop-only */}
-      {zoomPhase !== "idle" && (
+      {/* Full-screen overlay: laptop zoom + white blend + fade-out reveal */}
+      {isAnimating && (
         <motion.div
-          className="pointer-events-none absolute inset-0 z-20 flex items-center justify-center bg-black"
+          ref={overlayRef}
+          className="pointer-events-none fixed inset-0 z-20 flex items-center justify-center bg-black"
           initial={{ opacity: 0 }}
-          animate={{ opacity: 1 }}
-          transition={{ duration: ZOOM_FADE_DURATION_S, ease: "easeOut" }}
+          animate={{ opacity: zoomPhase === "revealing" ? 0 : 1 }}
+          transition={{
+            duration:
+              zoomPhase === "revealing" ? OVERLAY_FADE_OUT_S : OVERLAY_FADE_IN_S,
+            ease: "easeOut",
+          }}
+          onAnimationComplete={
+            zoomPhase === "revealing" ? handleRevealComplete : undefined
+          }
           aria-hidden
         >
+          {/* Laptop image — zooms continuously for the full duration */}
           <motion.div
             className="flex h-full w-full items-center justify-center overflow-hidden"
             initial={{ scale: 1 }}
             animate={{ scale: LAPTOP_FINAL_SCALE }}
             transition={{
-              duration: ZOOM_DURATION_S,
-              ease: "easeOut",
-              delay: ZOOM_FADE_DURATION_S,
+              duration: ZOOM_TOTAL_S,
+              ease: [0.25, 0.1, 0.25, 1], // cubic-bezier for smooth deceleration
+              delay: OVERLAY_FADE_IN_S,
             }}
-            onAnimationComplete={handleZoomComplete}
             style={{ transformOrigin: "center center" }}
           >
             <Image
@@ -167,6 +179,23 @@ export default function Hero() {
               unoptimized
             />
           </motion.div>
+
+          {/*
+            White overlay — starts fading in partway through the zoom so
+            the zoom-to-white feels like one continuous motion.
+            Its onAnimationComplete fires the jump + reveal.
+          */}
+          <motion.div
+            className="absolute inset-0 bg-white"
+            initial={{ opacity: 0 }}
+            animate={{ opacity: zoomPhase === "zooming" ? 1 : 1 }}
+            transition={{
+              duration: WHITE_FADE_IN_S,
+              ease: "easeIn",
+              delay: zoomPhase === "zooming" ? WHITE_STARTS_AT_S + OVERLAY_FADE_IN_S : 0,
+            }}
+            onAnimationComplete={handleWhiteComplete}
+          />
         </motion.div>
       )}
 
