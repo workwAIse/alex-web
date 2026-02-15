@@ -16,7 +16,7 @@ import { useRef, useState } from "react";
 
 const NAV_ITEMS = [
   { label: "Home", icon: <VenetianMask size={16} />, href: "/" },
-  { label: "Projects", icon: <BriefcaseBusiness size={16} />, href: "/#projects" },
+  { label: "Selected projects", icon: <BriefcaseBusiness size={16} />, href: "/#projects" },
   { label: "Skills", icon: <PocketKnife size={16} />, href: "/#skills" },
   { label: "Code", icon: <Compass size={16} />, href: "/#code" },
   { label: "Gems", icon: <Balloon size={16} />, href: "/#gems" },

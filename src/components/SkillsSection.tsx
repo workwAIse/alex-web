@@ -2,6 +2,29 @@
 
 import { LampDesk } from "lucide-react";
 import { MarqueeDemo } from "@/components/ui/marquee-demo";
+import { BestSkillPill } from "@/components/ui/best-skill-pill";
+
+/** Best skills (easter egg): show particle + Claude-style hover effect. Match by normalized substring or exact. */
+const BEST_SKILLS = [
+  "Product Delivery",
+  "forefront of AI",
+  "Product Analytics",
+  "ML enabled products",
+  "german",
+];
+
+function isBestSkill(skill: string): boolean {
+  const s = skill.toLowerCase();
+  return BEST_SKILLS.some((b) => {
+    const bn = b.toLowerCase();
+    if (bn === "german") return s === "german";
+    if (bn === "product delivery") return s.includes("product delivery");
+    if (bn === "forefront of ai") return s.includes("forefront");
+    if (bn === "product analytics") return s === "product analytics";
+    if (bn === "ml enabled products") return s.includes("ml-enabled") || s.includes("ml enabled");
+    return false;
+  });
+}
 
 /**
  * Skills section — Claude (Anthropic) brand.
@@ -17,7 +40,7 @@ const CATEGORIES = [
       "User Journey Design",
       "Product Discovery",
       "Cross-functional Collaboration",
-      "(Complex) Product Delivery",
+      "Product Delivery",
       "Stakeholder Alignment",
       "Outcome-driven Product Development",
     ],
@@ -68,23 +91,34 @@ export default function SkillsSection() {
       }}
     >
       <div className="mx-auto max-w-3xl">
-        {/* Header: title with lamp-desk icon */}
-        <header className="flex items-center gap-3">
-          <span
-            className="flex shrink-0 text-3xl md:text-4xl text-black"
-            aria-hidden
-          >
-            <LampDesk className="size-[1em]" strokeWidth={1.5} />
-          </span>
-          <h2
-            className="text-3xl font-bold tracking-tight md:text-4xl"
+        {/* Header: title with lamp-desk icon + subheadline */}
+        <header className="flex flex-col gap-1">
+          <div className="flex items-center gap-3">
+            <span
+              className="flex shrink-0 text-3xl md:text-4xl text-black"
+              aria-hidden
+            >
+              <LampDesk className="size-[1em]" strokeWidth={1.5} />
+            </span>
+            <h2
+              className="text-3xl font-bold tracking-tight md:text-4xl"
+              style={{
+                color: "#141413",
+                fontFamily: "var(--font-poppins), Arial, sans-serif",
+              }}
+            >
+              Skills
+            </h2>
+          </div>
+          <p
+            className="text-base opacity-80 md:text-lg"
             style={{
               color: "#141413",
-              fontFamily: "var(--font-poppins), Arial, sans-serif",
+              fontFamily: "var(--font-lora), Georgia, serif",
             }}
           >
-            Skills
-          </h2>
+            This amongst others is what I bring to the team
+          </p>
         </header>
 
         {/* Category blocks with pill-shaped tags — Anthropic light gray */}
@@ -101,19 +135,23 @@ export default function SkillsSection() {
                 {cat.title}
               </h3>
               <div className="mt-4 flex flex-wrap gap-2">
-                {cat.skills.map((skill, j) => (
-                  <span
-                    key={j}
-                    className="rounded-full border px-2.5 py-1 text-sm"
-                    style={{
-                      backgroundColor: "#e8e6dc",
-                      borderColor: "#b0aea5",
-                      color: "#141413",
-                    }}
-                  >
-                    {skill}
-                  </span>
-                ))}
+                {cat.skills.map((skill, j) =>
+                  isBestSkill(skill) ? (
+                    <BestSkillPill key={j}>{skill}</BestSkillPill>
+                  ) : (
+                    <span
+                      key={j}
+                      className="rounded-full border px-2.5 py-1 text-sm"
+                      style={{
+                        backgroundColor: "#e8e6dc",
+                        borderColor: "#b0aea5",
+                        color: "#141413",
+                      }}
+                    >
+                      {skill}
+                    </span>
+                  )
+                )}
               </div>
             </div>
           ))}

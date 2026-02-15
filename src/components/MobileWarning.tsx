@@ -33,8 +33,8 @@ export default function MobileWarning() {
     >
       <div className="mx-4 flex max-w-sm flex-col items-center rounded-2xl bg-white px-6 pb-6 pt-8 text-center shadow-2xl">
         <Image
-          src="/no-mobile.png"
-          alt="Sad phone illustration"
+          src="/mobilebad.png"
+          alt="Phone with low battery and sad face — site not optimized for mobile"
           width={180}
           height={180}
           className="mb-4"

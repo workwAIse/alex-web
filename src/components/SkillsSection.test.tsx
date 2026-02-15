@@ -22,7 +22,7 @@ describe("SkillsSection", () => {
     expect(screen.getByRole("heading", { level: 3, name: "AI & Innovation" })).toBeDefined();
     expect(screen.getByText("Product Strategy & Roadmapping")).toBeDefined();
     expect(screen.getByText("LLM-powered Workflows")).toBeDefined();
-    expect(screen.getByText("German (Native)")).toBeDefined();
-    expect(screen.getByText("English (Fluent)")).toBeDefined();
+    expect(screen.getByText("German")).toBeDefined();
+    expect(screen.getByText("English")).toBeDefined();
   });
 });

@@ -15,7 +15,7 @@ describe("ProjectsSection", () => {
   it("renders Projects heading", () => {
     render(<ProjectsSection />);
     expect(
-      screen.getByRole("heading", { level: 2, name: /Projects/i })
+      screen.getByRole("heading", { level: 2, name: /Selected projects/i })
     ).toBeDefined();
   });
 

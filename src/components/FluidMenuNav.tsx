@@ -18,7 +18,7 @@ const NAV_ICON_SIZE = 36;
 const NAV_ITEMS = [
   { label: "Home", icon: <VenetianMask size={NAV_ICON_SIZE} strokeWidth={1.5} />, href: "/" },
   {
-    label: "Projects",
+    label: "Selected projects",
     icon: <BriefcaseBusiness size={NAV_ICON_SIZE} strokeWidth={1.5} />,
     href: "/#projects",
   },

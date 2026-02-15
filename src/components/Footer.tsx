@@ -30,7 +30,7 @@ export default function Footer() {
               className="text-base leading-relaxed opacity-95 md:text-lg"
               style={{ fontFamily: "var(--font-montserrat, inherit)" }}
             >
-              Happy that you came this far. By now you’ve probably learned — I love the craft of digital products. Shipping value fast matters most to me: delighting users, making complexity easy, and driving business metrics.
+              Happy that you came this far. By now you’ve probably learned — I love the <strong>craft of digital products</strong>. Shipping value fast matters most to me: delighting users, making complexity easy, and driving business metrics.
             </p>
           </div>
 
@@ -38,7 +38,7 @@ export default function Footer() {
           <div className="flex flex-col items-center justify-center md:items-end md:pl-4">
             <div className="relative h-40 w-40 md:h-52 md:w-52">
               <Image
-                src="/dachshund1.png"
+                src="/dachshund-final.png"
                 alt="Dachshund enjoying a meal"
                 fill
                 className="object-contain object-center"

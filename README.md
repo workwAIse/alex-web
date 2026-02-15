@@ -51,8 +51,8 @@ The homepage includes five product-themed sections (placeholders for real conten
 
 | Section     | Product | Label     | Content  |
 | ----------- | ------- | --------- | -------- |
-| `#projects` | OpenAI  | Projects  | Work experience: four case studies (Squat Test, EGYM Genius, Fitness Hub seca edition, Mortgage Comparison Engine Rebuild) with Goal, My role, Key work, Impact; AI chat per project |
-| `#skills`   | Claude  | Skills    | My skills (with logo marquee at bottom) |
+| `#projects` | OpenAI  | Selected projects  | Work experience: four case studies (Squat Test, EGYM Genius, Fitness Hub seca edition, Mortgage Comparison Engine Rebuild) with Goal, My role, Key work, Impact; AI chat per project |
+| `#skills`   | Claude  | Skills    | My skills (with logo marquee at bottom). **Easter egg:** “best” skills (Product Delivery, forefront of AI, Product Analytics, ML-enabled products, German) use **BestSkillPill**: on hover they show a Claude-colored particle effect and a sparkle icon (see `best-skill-pill.tsx`). |
 | `#code`     | Cursor  | Code      | Hobby projects in a Cursor IDE–style view: syntax-highlighted `hobby-projects.ts`, link row (“Open: workwAIse · …”). **Easter egg:** click **Run** in the menu bar to “build” and see the built view inside a single Mac-like browser window (localhost chrome): a **Gallery4** carousel of the four hobby project cards (image, title, description, “Read more”); **View Source** returns to the code view. |
 | `#gems`     | Gemini  | Gems      | Private Gems (headline), subheadline “Learn a bit about me besides (and maybe within) work”. Google Gem Manager–style grid with three-dots overflow menu per card; one item “Current favorite” (with star icon) (link out per gem, optional). Data in `src/data/gems.ts`. |
 Each section uses brand-aligned colors, typography, and layout. Add your real copy and data in the corresponding components when ready.
@@ -62,7 +62,7 @@ Each section uses brand-aligned colors, typography, and layout. Add your real co
 The end of the page uses a **sticky footer reveal** (inspired by [Dataleap.ai](https://dataleap.ai)): the main content has large rounded bottom corners and a subtle shadow. As you scroll past the last section, the footer (fixed behind the content) is revealed, as if the page lifts away. Implemented with:
 
 - **`StickyFooterReveal`** (`src/components/StickyFooterReveal.tsx`) – Wraps the whole page: main content in a rounded wrapper (`z-10`), a spacer (`min-height: 60vh`) for scroll room, and a **fixed** footer (`z-0`) at the bottom. No JavaScript; layout is responsive using `vh` and `clamp()` for corner radius.
-- **`Footer`** (`src/components/Footer.tsx`) – Footer content in three zones: (1) left — short message about loving the craft of digital products (Montserrat, same as header); (2) center — “Get in contact” with LinkedIn logo (Lucide `Linkedin` icon, link from `NEXT_PUBLIC_LINKEDIN_URL` in `.env.local`, default `https://www.linkedin.com/in/alexander-büchel/`); (3) right — scaled dachshund image (`public/dachshund1.png`) and the line “Leave me alone with my footer.” Bottom row (right-aligned): copyright and clickable **Impressum** link to `/impressum`. Theming uses CSS variables `--footer-bg` and `--footer-fg` in `globals.css`; corner radius is `--footer-reveal-radius`. Tweak these in `globals.css` to change the look.
+- **`Footer`** (`src/components/Footer.tsx`) – Footer content in three zones: (1) left — short message about loving the craft of digital products (Montserrat, same as header); (2) center — “Get in contact” with LinkedIn logo (Lucide `Linkedin` icon, link from `NEXT_PUBLIC_LINKEDIN_URL` in `.env.local`, default `https://www.linkedin.com/in/alexander-büchel/`); (3) right — scaled dachshund image (`public/dachshund-final.png`) and the line “Leave me alone with my footer.” Bottom row (right-aligned): copyright and clickable **Impressum** link to `/impressum`. Theming uses CSS variables `--footer-bg` and `--footer-fg` in `globals.css`; corner radius is `--footer-reveal-radius`. Tweak these in `globals.css` to change the look.
 
 ### Section-aware custom cursor
 
@@ -82,7 +82,7 @@ The custom cursor is disabled when the user prefers reduced motion or has a coar
 
 The site uses a **fluid corner menu** in the bottom-right:
 
-- **`FluidMenuNav`** (`src/components/FluidMenuNav.tsx`) – Fixed at bottom-right (`bottom-4 right-4`). The trigger is the **AI logo** (Lottie from `public/AI logo Foriday.json`). Tapping it expands the menu **upward** with nav items (Home, Projects, Skills, Code, Gems, Contact). Item clicks smooth-scroll to the corresponding section. Built with **`fluid-menu`** UI primitives.
+- **`FluidMenuNav`** (`src/components/FluidMenuNav.tsx`) – Fixed at bottom-right (`bottom-4 right-4`). The trigger is the **AI logo** (Lottie from `public/AI logo Foriday.json`). Tapping it expands the menu **upward** with nav items (Home, Selected projects, Skills, Code, Gems, Contact). Item clicks smooth-scroll to the corresponding section. Built with **`fluid-menu`** UI primitives.
 
 - **`src/components/ui/fluid-menu.tsx`** – `Menu`, `MenuItem`, and `MenuContainer`. `MenuContainer` supports `expandDirection: "up" | "down"` so the stack opens above the trigger (for corner placement) or below.
 
@@ -106,6 +106,8 @@ Reusable UI primitives live in **`src/components/ui/`**. This folder follows the
 - **`src/components/ui/background-gradient.tsx`** – **BackgroundGradient**: animated gradient border (Framer Motion). Available for other uses.
 - **`src/components/ui/spotlight-card.tsx`** – **GlowCard**: cursor-follow spotlight glow card (available for other uses).
 - **`src/components/ui/sparkles.tsx`** – **SparklesCore** (tsparticles). Used by the Compare component for the slider handle sparkles.
+- **`src/components/ui/best-skill-pill.tsx`** – **BestSkillPill**: pill badge with Claude colors; on hover shows tsparticles star burst and sparkle icon (used in Skills section for “best” skills). Requires `tsparticles` (full bundle) for emitters/absorbers.
+- **`src/components/ui/button-8.tsx`** – Demo button with particle effect on hover (blue/purple gradient, Sparkle icons). Reference implementation for the best-skill pill; not used in the app.
 - **`src/data/hobby-projects.ts`** – Data for the Code section: four hobby projects (title, link, description, tech, details; optional `previewImageUrl` for card images).
 - **`src/data/gems.ts`** – Data for the Gems section: eight personal gems (title, shortDescription, icon, iconColor, optional favoriteLink) for the Gem Manager–style grid; each card has a three-dots menu with “Current favorite” (star icon; links to favoriteLink when set).
 

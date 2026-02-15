@@ -47,7 +47,7 @@ const PROJECT_ENTRIES: ProjectEntry[] = [
       "Successfully shipped a partner-integrated innovation product to global markets; enabled large-scale pilots and GTM execution with enterprise customers.",
     tasks:
       "Owned the software product from concept to global launch, drove product/design/engineering decisions, cross-company coordination with seca, ensured readiness for key milestones (tradeshows, pilots, enterprise customers).",
-    role: "Software Product Lead (EGYM side)",
+    role: "Product Manager (Software)",
     showChat: false,
   },
   {
@@ -59,7 +59,7 @@ const PROJECT_ENTRIES: ProjectEntry[] = [
       "Reduced plan creation time 60 min → 20 min; increased Fitness Hub NPS 4.0 → 4.2; ensured great launch success in time for the 2024 tradeshows",
     tasks:
       "Owned the end-to-end Fitness Hub experience, shaped holistic member journey across devices, ensured delivery across MVP/pilot/rollout.",
-    role: "Contributing Product Manager (Fitness Hub)",
+    role: "Contributing PM (Fitness Hub)",
     showChat: true,
   },
   {
@@ -96,7 +96,7 @@ export default function ProjectsSection() {
                 aria-hidden
               />
               <h2 className="text-4xl font-semibold tracking-tight text-[#171717] md:text-5xl">
-                Projects
+                Selected projects
               </h2>
             </div>
           </header>
