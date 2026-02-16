@@ -38,20 +38,33 @@ describe("GemsSection", () => {
     render(<GemsSection />);
     expect(screen.getByText(/Experimenting with LLMs/)).toBeDefined();
     expect(screen.getByText(/Building small tools/)).toBeDefined();
-    expect(screen.getByText(/pitching the product on a big stage/)).toBeDefined();
+    expect(screen.getByText(/Sometimes even on a big stage/)).toBeDefined();
   });
 
-  it("shows Current favorite with star icon in overflow menu", () => {
+  it("shows Favorite and Pin in overflow menu", () => {
     render(<GemsSection />);
     const moreButtons = screen.getAllByRole("button", { name: /More options/i });
     fireEvent.click(moreButtons[0]);
-    expect(screen.getByText("Current favorite")).toBeDefined();
-    expect(screen.getByRole("menuitem")).toBeDefined();
+    expect(screen.getByText("Favorite")).toBeDefined();
+    expect(screen.getByText("Pin")).toBeDefined();
+    const menuItems = screen.getAllByRole("menuitem");
+    expect(menuItems.length).toBeGreaterThanOrEqual(2);
   });
 
   it("does not render Show more or Show less button", () => {
     render(<GemsSection />);
     expect(screen.queryByRole("button", { name: /Show more/i })).toBeNull();
     expect(screen.queryByText(/Show less/i)).toBeNull();
+  });
+
+  it("pinning a gem moves it to the top of the grid", () => {
+    render(<GemsSection />);
+    // Open menu on the 4th gem (AI Explorer, 0-based index 3)
+    const moreButtons = screen.getAllByRole("button", { name: /More options/i });
+    fireEvent.click(moreButtons[3]);
+    fireEvent.click(screen.getByRole("menuitem", { name: /^Pin$/i }));
+    // First heading in the section content should now be AI Explorer
+    const headings = screen.getAllByRole("heading", { level: 3 });
+    expect(headings[0].textContent).toContain("AI Explorer");
   });
 });

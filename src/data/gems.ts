@@ -14,7 +14,7 @@ export type Gem = {
   shortDescription: string;
   icon: GemIconName;
   iconColor: string;
-  /** Optional "Current favorite" link; when absent, menu still shows but item has no href. */
+  /** Optional "Favorite" link; when absent, menu still shows but item has no href. */
   favoriteLink?: string;
 };
 

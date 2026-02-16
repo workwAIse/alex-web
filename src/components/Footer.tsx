@@ -44,9 +44,9 @@ export default function Footer() {
                 className="object-contain object-center"
                 sizes="293px"
               />
-              {/* Desktop: caption overlaid on image */}
+              {/* Desktop: caption overlaid on image — same size/rhythm as legal (Haftungsausschluss) body text */}
               <p
-                className="absolute bottom-[18%] left-0 right-0 hidden text-center text-sm italic opacity-90 md:block md:whitespace-nowrap md:text-right"
+                className="absolute bottom-[18%] left-0 right-0 hidden text-center text-base leading-relaxed opacity-90 md:block md:whitespace-nowrap md:text-right"
                 style={{
                   fontFamily: "var(--font-montserrat, inherit)",
                   textShadow: "0 1px 2px rgba(0,0,0,0.6)",
@@ -57,7 +57,7 @@ export default function Footer() {
             </div>
             {/* Mobile: caption below the image */}
             <p
-              className="mt-2 text-center text-sm italic opacity-90 md:hidden"
+              className="mt-2 text-center text-base leading-relaxed opacity-90 md:hidden"
               style={{
                 fontFamily: "var(--font-montserrat, inherit)",
               }}

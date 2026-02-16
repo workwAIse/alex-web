@@ -54,7 +54,7 @@ The homepage includes five product-themed sections (placeholders for real conten
 | `#projects` | OpenAI  | Selected projects  | Work experience: four case studies (Squat Test, EGYM Genius, Fitness Hub seca edition, Mortgage Comparison Engine Rebuild) with Goal, My role, Key work, Impact; AI chat per project |
 | `#skills`   | Claude  | Skills    | My skills (with logo marquee at bottom). **Easter egg:** “best” skills (Product Delivery, forefront of AI, Product Analytics, ML-enabled products, German) use **BestSkillPill**: on hover they show a Claude-colored particle effect and a sparkle icon (see `best-skill-pill.tsx`). |
 | `#code`     | Cursor  | Code      | Hobby projects in a Cursor IDE–style view: syntax-highlighted `hobby-projects.ts`, link row (“Open: workwAIse · …”). **Easter egg:** click **Run** in the menu bar to “build” and see the built view inside a single Mac-like browser window (localhost chrome): a **Gallery4** carousel of the four hobby project cards (image, title, description, “Read more”); **View Source** returns to the code view. |
-| `#gems`     | Gemini  | Gems      | Private Gems (headline), subheadline “Learn a bit about me besides (and maybe within) work”. Google Gem Manager–style grid with three-dots overflow menu per card; one item “Current favorite” (with star icon) (link out per gem, optional). Data in `src/data/gems.ts`. |
+| `#gems`     | Gemini  | Gems      | Private Gems (headline), subheadline “Learn a bit about me besides (and maybe within) work”. Google Gem Manager–style grid with three-dots overflow menu per card: “Favorite” (star icon; link out per gem, optional) and “Pin” (pin icon). Pinning moves a gem to the top with a spring animation; multiple pins stack (most recent on top). Order is not persisted (resets on reload). Data in `src/data/gems.ts`. |
 Each section uses brand-aligned colors, typography, and layout. Add your real copy and data in the corresponding components when ready.
 
 ### Sticky footer reveal
@@ -115,7 +115,7 @@ Reusable UI primitives live in **`src/components/ui/`**. This folder follows the
 - **`src/components/ui/best-skill-pill.tsx`** – **BestSkillPill**: pill badge with Claude colors; on hover shows tsparticles star burst and sparkle icon (used in Skills section for “best” skills). Requires `tsparticles` (full bundle) for emitters/absorbers.
 - **`src/components/ui/button-8.tsx`** – Demo button with particle effect on hover (blue/purple gradient, Sparkle icons). Reference implementation for the best-skill pill; not used in the app.
 - **`src/data/hobby-projects.ts`** – Data for the Code section: four hobby projects (title, link, description, tech, details; optional `previewImageUrl` for card images).
-- **`src/data/gems.ts`** – Data for the Gems section: eight personal gems (title, shortDescription, icon, iconColor, optional favoriteLink) for the Gem Manager–style grid; each card has a three-dots menu with “Current favorite” (star icon; links to favoriteLink when set).
+- **`src/data/gems.ts`** – Data for the Gems section: eight personal gems (title, shortDescription, icon, iconColor, optional favoriteLink) for the Gem Manager–style grid; each card has a three-dots menu with “Favorite” (star icon; links to favoriteLink when set) and “Pin” (pin icon; reorders grid with animation, session-only).
 
 ### Marquee logos (Logo.dev)
 
