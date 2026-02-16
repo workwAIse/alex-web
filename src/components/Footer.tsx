@@ -23,7 +23,7 @@ export default function Footer() {
     >
       <div className="mx-auto w-full max-w-6xl">
         {/* Main two-zone row: message | dachshund */}
-        <div className="grid grid-cols-1 gap-10 pb-6 md:grid-cols-2 md:gap-8 md:pb-8">
+        <div className="grid grid-cols-1 gap-10 pb-8 md:grid-cols-2 md:gap-8 md:pb-8">
           {/* Left: Craft message — Montserrat to match header */}
           <div className="flex flex-col justify-center md:pr-4">
             <p
@@ -34,7 +34,7 @@ export default function Footer() {
             </p>
           </div>
 
-          {/* Right: Dachshund with "Leave me alone" inside image container. */}
+          {/* Right: Dachshund with "Leave me alone" — below image on mobile, overlaid on desktop. */}
           <div className="flex flex-col items-center justify-center md:items-end md:pl-4">
             <div className="relative h-[226px] w-[226px] md:h-[293px] md:w-[293px]">
               <Image
@@ -44,26 +44,36 @@ export default function Footer() {
                 className="object-contain object-center"
                 sizes="293px"
               />
+              {/* Desktop: caption overlaid on image */}
               <p
-                className="absolute bottom-[18%] left-0 right-0 text-center text-sm italic opacity-90 md:whitespace-nowrap md:text-right"
+                className="absolute bottom-[18%] left-0 right-0 hidden text-center text-sm italic opacity-90 md:block md:whitespace-nowrap md:text-right"
                 style={{
                   fontFamily: "var(--font-montserrat, inherit)",
                   textShadow: "0 1px 2px rgba(0,0,0,0.6)",
                 }}
               >
-                Leave me alone with my footer.
+                "Leave me alone with my footer"
               </p>
             </div>
+            {/* Mobile: caption below the image */}
+            <p
+              className="mt-2 text-center text-sm italic opacity-90 md:hidden"
+              style={{
+                fontFamily: "var(--font-montserrat, inherit)",
+              }}
+            >
+              "Leave me alone with my footer"
+            </p>
           </div>
         </div>
 
-        {/* Bottom: Get in contact (left) | copyright + legal links (right). Row 14px higher. */}
-        <div className="-mt-[14px] flex flex-nowrap items-center justify-between gap-6 border-t border-white/10 pt-6">
+        {/* Bottom: centered on mobile; Get in contact (left) | copyright + legal links (right) on desktop. No negative margin on mobile so this row stays below the dachshund. */}
+        <div className="flex flex-col items-center gap-4 border-t border-white/10 pt-6 text-center md:-mt-[14px] md:flex-row md:flex-nowrap md:items-center md:justify-between md:gap-6 md:text-left">
           <a
             href={LINKEDIN_URL}
             target="_blank"
             rel="noopener noreferrer"
-            className="flex shrink-0 items-center gap-2 text-sm opacity-90 transition-opacity hover:opacity-100 focus:outline-none focus:ring-2 focus:ring-white/30 focus:ring-offset-2 focus:ring-offset-[var(--footer-bg)]"
+            className="flex shrink-0 items-center justify-center gap-2 text-sm opacity-90 transition-opacity hover:opacity-100 focus:outline-none focus:ring-2 focus:ring-white/30 focus:ring-offset-2 focus:ring-offset-[var(--footer-bg)] md:justify-start"
             aria-label="Alex Büchel on LinkedIn"
             style={{ fontFamily: "var(--font-montserrat, inherit)" }}
           >
@@ -75,7 +85,7 @@ export default function Footer() {
             />
           </a>
           <span
-            className="flex shrink-0 flex-wrap items-center justify-end gap-x-4 gap-y-1 text-xs opacity-70"
+            className="flex min-w-0 flex-wrap items-center justify-center gap-x-4 gap-y-1 text-xs opacity-70 md:justify-end md:shrink-0"
             style={{ fontFamily: "var(--font-montserrat, inherit)" }}
           >
             <span>© {new Date().getFullYear()}. All rights reserved.</span>

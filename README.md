@@ -61,8 +61,14 @@ Each section uses brand-aligned colors, typography, and layout. Add your real co
 
 The end of the page uses a **sticky footer reveal** (inspired by [Dataleap.ai](https://dataleap.ai)): the main content has large rounded bottom corners and a subtle shadow. As you scroll past the last section, the footer (fixed behind the content) is revealed, as if the page lifts away. Implemented with:
 
-- **`StickyFooterReveal`** (`src/components/StickyFooterReveal.tsx`) – Wraps the whole page: main content in a rounded wrapper (`z-10`), a spacer (`min-height: 60vh`) for scroll room, and a **fixed** footer (`z-0`) at the bottom. No JavaScript; layout is responsive using `vh` and `clamp()` for corner radius.
+- **`StickyFooterReveal`** (`src/components/StickyFooterReveal.tsx`) – Wraps the whole page: main content in a rounded wrapper (`z-10`), a spacer (`min-height: 60vh`) for scroll room, and a **fixed** footer (`z-0`) at the bottom. No JavaScript; layout is responsive using `vh` and `clamp()` for corner radius. **On mobile (viewport ≤768px)** the footer is rendered in normal document flow so the full footer (including Impressum, Datenschutzerklärung, Haftungsausschluss) is scrollable.
 - **`Footer`** (`src/components/Footer.tsx`) – Footer content in three zones: (1) left — short message about loving the craft of digital products (Montserrat, same as header); (2) center — “Get in contact” with LinkedIn logo (Lucide `Linkedin` icon, link from `NEXT_PUBLIC_LINKEDIN_URL` in `.env.local`, default `https://www.linkedin.com/in/alexander-büchel/`); (3) right — scaled dachshund image (`public/dachshund-final.png`) and the line “Leave me alone with my footer.” Bottom row (right-aligned): copyright and legal links — **Impressum** (`/impressum`), **Datenschutzerklärung** (`/datenschutz`), **Haftungsausschluss** (`/haftungsausschluss`). Theming uses CSS variables `--footer-bg` and `--footer-fg` in `globals.css`; corner radius is `--footer-reveal-radius`. Tweak these in `globals.css` to change the look.
+
+### Mobile behaviour (viewport ≤768px)
+
+- **Hero:** The scroll-triggered laptop zoom animation is disabled; the hero shows the Unicorn scene and scroll hint only. Implemented via `useIsMobile()` from `src/hooks/useMediaQuery.ts`.
+- **Code section “built” view:** The hobby projects are shown as a **vertical stack** of cards (no horizontal carousel) so layout stays readable on narrow screens. The built-view container uses a smaller min-height and max-height on mobile so it fits the viewport and scrolls inside.
+- **Footer:** See Sticky footer reveal above — footer is in document flow on mobile so the full footer (including legal links) can be scrolled into view.
 
 ### Section-aware custom cursor
 
@@ -102,7 +108,7 @@ Reusable UI primitives live in **`src/components/ui/`**. This folder follows the
 - **`src/components/ui/compare.tsx`** – Compare (image before/after slider) and CompareContent; optional for other uses (Code section uses Run / View Source toggle instead).
 - **`src/components/ui/button.tsx`** – **Button**: shadcn-style button (variants: default, ghost, outline, etc.). Used by Carousel and Gallery4.
 - **`src/components/ui/carousel.tsx`** – **Carousel**: Embla-based carousel (CarouselContent, CarouselItem, setApi). Used by Gallery4.
-- **`src/components/ui/gallery4.tsx`** – **Gallery4**: horizontal carousel of cards (image, gradient overlay, title, description, “Read more”). Used in the Code section’s “built” view inside the Mac browser frame; accepts `items` (Gallery4Item[]), optional `title`, `description`, and `action` (e.g. View Source button).
+- **`src/components/ui/gallery4.tsx`** – **Gallery4**: horizontal carousel of cards (image, gradient overlay, title, description, “Read more”). On mobile (≤768px) it renders a vertical stack instead of the carousel. Used in the Code section’s “built” view inside the Mac browser frame; accepts `items` (Gallery4Item[]), optional `title`, `description`, and `action` (e.g. View Source button).
 - **`src/components/ui/background-gradient.tsx`** – **BackgroundGradient**: animated gradient border (Framer Motion). Available for other uses.
 - **`src/components/ui/spotlight-card.tsx`** – **GlowCard**: cursor-follow spotlight glow card (available for other uses).
 - **`src/components/ui/sparkles.tsx`** – **SparklesCore** (tsparticles). Used by the Compare component for the slider handle sparkles.

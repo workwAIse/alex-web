@@ -10,6 +10,7 @@ import {
   CarouselContent,
   CarouselItem,
 } from "@/components/ui/carousel";
+import { useIsMobile } from "@/hooks/useMediaQuery";
 
 export interface Gallery4Item {
   id: string;
@@ -27,12 +28,46 @@ export interface Gallery4Props {
   action?: React.ReactNode;
 }
 
+function GalleryCard({ item }: { item: Gallery4Item }) {
+  return (
+    <a
+      href={item.href}
+      target="_blank"
+      rel="noopener noreferrer"
+      className="group block rounded-xl"
+      aria-label={`Open ${item.title} in new tab`}
+    >
+      <div className="group relative h-full min-h-[14rem] w-full max-w-full overflow-hidden rounded-xl aspect-[5/4]">
+        <img
+          src={item.image}
+          alt={item.title}
+          className="absolute h-full w-full object-cover object-center transition-transform duration-300 group-hover:scale-105"
+        />
+        <div className="absolute inset-0 h-full bg-[linear-gradient(hsl(var(--primary)/0),hsl(var(--primary)/0.4),hsl(var(--primary)/0.8)_100%)] mix-blend-multiply" />
+        <div className="absolute inset-x-0 bottom-0 flex flex-col items-start p-4 text-primary-foreground md:p-5">
+          <div className="mb-2 pt-2 text-lg font-semibold md:mb-3 md:pt-3">
+            {item.title}
+          </div>
+          <div className="mb-6 line-clamp-2 text-sm md:mb-8">
+            {item.description}
+          </div>
+          <div className="flex items-center text-sm">
+            Read more{" "}
+            <ArrowRight className="ml-2 size-5 transition-transform group-hover:translate-x-1" />
+          </div>
+        </div>
+      </div>
+    </a>
+  );
+}
+
 const Gallery4 = ({
   title = "Case Studies",
   description = "Discover how leading companies and developers are leveraging modern web technologies to build exceptional digital experiences.",
   items,
   action,
 }: Gallery4Props) => {
+  const isMobile = useIsMobile();
   const [carouselApi, setCarouselApi] = useState<CarouselApi>();
   const [canScrollPrev, setCanScrollPrev] = useState(false);
   const [canScrollNext, setCanScrollNext] = useState(false);
@@ -58,7 +93,34 @@ const Gallery4 = ({
     };
   }, [carouselApi]);
 
+  useEffect(() => {
+    if (!carouselApi || isMobile) return;
+    const handleResize = () => carouselApi.reInit();
+    window.addEventListener("resize", handleResize);
+    return () => window.removeEventListener("resize", handleResize);
+  }, [carouselApi, isMobile]);
+
   const needsScroll = canScrollPrev || canScrollNext;
+
+  if (isMobile) {
+    return (
+      <section className="py-6">
+        <div className="container mx-auto px-0">
+          <div className="mb-4 flex flex-col gap-2">
+            <h2 className="text-2xl font-medium">{title}</h2>
+            <p className="max-w-lg text-sm text-muted-foreground">
+              {description}
+            </p>
+          </div>
+        </div>
+        <div className="flex w-full flex-col gap-4">
+          {items.map((item) => (
+            <GalleryCard key={item.id} item={item} />
+          ))}
+        </div>
+      </section>
+    );
+  }
 
   return (
     <section className="py-6">
@@ -122,34 +184,7 @@ const Gallery4 = ({
                 key={item.id}
                 className="max-w-[288px] pl-4 md:max-w-[324px] lg:pl-5"
               >
-                <a
-                  href={item.href}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="group block rounded-xl"
-                  aria-label={`Open ${item.title} in new tab`}
-                >
-                  <div className="group relative h-full min-h-[18rem] max-w-full overflow-hidden rounded-xl md:aspect-[5/4] lg:aspect-[16/9]">
-                    <img
-                      src={item.image}
-                      alt={item.title}
-                      className="absolute h-full w-full object-cover object-center transition-transform duration-300 group-hover:scale-105"
-                    />
-                    <div className="absolute inset-0 h-full bg-[linear-gradient(hsl(var(--primary)/0),hsl(var(--primary)/0.4),hsl(var(--primary)/0.8)_100%)] mix-blend-multiply" />
-                    <div className="absolute inset-x-0 bottom-0 flex flex-col items-start p-4 text-primary-foreground md:p-5">
-                      <div className="mb-2 pt-2 text-lg font-semibold md:mb-3 md:pt-3">
-                        {item.title}
-                      </div>
-                      <div className="mb-6 line-clamp-2 text-sm md:mb-8">
-                        {item.description}
-                      </div>
-                      <div className="flex items-center text-sm">
-                        Read more{" "}
-                        <ArrowRight className="ml-2 size-5 transition-transform group-hover:translate-x-1" />
-                      </div>
-                    </div>
-                  </div>
-                </a>
+                <GalleryCard item={item} />
               </CarouselItem>
             ))}
           </CarouselContent>

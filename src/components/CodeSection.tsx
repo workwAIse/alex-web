@@ -6,6 +6,7 @@ import { Gallery4 } from "@/components/ui/gallery4";
 import type { Gallery4Item } from "@/components/ui/gallery4";
 import { RainbowButton } from "@/components/ui/rainbow-button";
 import { SquareArrowOutUpRight, Play, Code2, Lock } from "lucide-react";
+import { useIsMobile } from "@/hooks/useMediaQuery";
 
 type TokenType = "keyword" | "string" | "name" | "comment" | "plain";
 
@@ -396,15 +397,16 @@ function builtViewGalleryItems(): Gallery4Item[] {
 }
 
 function BuiltView({ onViewSource }: { onViewSource: () => void }) {
+  const isMobile = useIsMobile();
   const galleryItems = useMemo(builtViewGalleryItems, []);
   return (
     <div
-      className="min-h-[480px] h-[520px] md:h-[600px] w-full flex flex-col overflow-hidden shadow-2xl border border-zinc-200 dark:border-zinc-700 bg-white dark:bg-zinc-900"
+      className="min-h-[360px] max-h-[85vh] w-full flex flex-col overflow-hidden shadow-2xl border border-zinc-200 dark:border-zinc-700 bg-white dark:bg-zinc-900 md:min-h-[480px] md:h-[520px] md:max-h-none lg:h-[600px]"
       style={{ backgroundColor: "#fff" }}
     >
       {/* Mac-like browser: same height as code view; in flow so you can scroll to other sections */}
       <div className="flex h-full w-full flex-col min-h-0">
-        {/* Mac title bar: traffic lights + URL (centered on page) + back to source code */}
+        {/* Mac title bar: traffic lights + URL (centered, hidden on mobile to avoid conflict with button) + back to source code */}
         <div className="relative flex items-center gap-2 px-4 py-2.5 border-b border-zinc-200 dark:border-zinc-700 bg-white dark:bg-zinc-800/95 shrink-0">
           <div className="flex gap-2 shrink-0 items-center">
             <button
@@ -417,14 +419,16 @@ function BuiltView({ onViewSource }: { onViewSource: () => void }) {
             <span className="w-3 h-3 rounded-full bg-[#febc2e]" title="Minimize" aria-hidden />
             <span className="w-3 h-3 rounded-full bg-[#28c840]" title="Maximize" aria-hidden />
           </div>
-          <div className="absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 flex items-center justify-center pointer-events-none">
-            <div className="flex items-center gap-2 py-1.5 px-4 rounded-lg bg-zinc-200/90 dark:bg-zinc-700/90 max-w-md pointer-events-auto">
-              <Lock className="h-3.5 w-3.5 shrink-0 text-zinc-500" aria-hidden />
-              <span className="truncate text-sm text-zinc-600 dark:text-zinc-400 font-medium">
-                localhost:3000
-              </span>
+          {!isMobile && (
+            <div className="absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 flex items-center justify-center pointer-events-none">
+              <div className="flex items-center gap-2 py-1.5 px-4 rounded-lg bg-zinc-200/90 dark:bg-zinc-700/90 max-w-md pointer-events-auto">
+                <Lock className="h-3.5 w-3.5 shrink-0 text-zinc-500" aria-hidden />
+                <span className="truncate text-sm text-zinc-600 dark:text-zinc-400 font-medium">
+                  localhost:3000
+                </span>
+              </div>
             </div>
-          </div>
+          )}
           <div className="flex-1" aria-hidden />
           <RainbowButton
             type="button"
