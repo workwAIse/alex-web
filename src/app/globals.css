@@ -48,7 +48,7 @@
   --page-bg: #000000;
   /* Rounded corner radius for sticky footer reveal (main content bottom edge); larger = more Dataleap-like */
   --footer-reveal-radius: clamp(2rem, 12vw, 6rem);
-  --footer-bg: #0a0a0a;
+  --footer-bg: #000000;
   --footer-fg: #ededed;
   --sky-400: #38bdf8;
   --sky-500: #0ea5e9;
@@ -135,7 +135,7 @@
     --background: #0a0a0a;
     --foreground: #ededed;
     --muted: #27272a;
-    --footer-bg: #171717;
+    --footer-bg: #000000;
     --footer-fg: #ededed;
     --sky-400: #38bdf8;
     --sky-500: #0ea5e9;

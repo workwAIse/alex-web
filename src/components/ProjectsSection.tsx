@@ -30,7 +30,7 @@ const PROJECT_ENTRIES: ProjectEntry[] = [
   {
     title: "EGYM Squat Test: AI Mobility Assessment",
     company: "egym",
-    defaultPrompt: "Tell me more about Alex's time at EGYM (and Interhyp respectively)",
+    defaultPrompt: "Tell me more about Alex's time at EGYM",
     outcome: "Delivered a premium onboarding assessment and unlock actionable mobility insights using 3D body analysis.",
     impact: "Reduced flexibility test time 5 min → 20 sec; doubled flexibility test retention",
     tasks:
@@ -41,7 +41,7 @@ const PROJECT_ENTRIES: ProjectEntry[] = [
   {
     title: "Fitness Hub seca edition: Integrated BIA Assessments",
     company: "egym",
-    defaultPrompt: "Tell me more about Alex's time at EGYM (and Interhyp respectively)",
+    defaultPrompt: "Tell me more about Alex's time at EGYM",
     outcome: "Launched a new product that combines best in class onboarding with medical-grade body composition analysis.",
     impact:
       "Successfully shipped a partner-integrated innovation product to global markets; enabled large-scale pilots and GTM execution with enterprise customers.",
@@ -53,7 +53,7 @@ const PROJECT_ENTRIES: ProjectEntry[] = [
   {
     title: "EGYM Genius: AI Training Plans",
     company: "egym",
-    defaultPrompt: "Tell me more about Alex's time at EGYM (and Interhyp respectively)",
+    defaultPrompt: "Tell me more about Alex's time at EGYM",
     outcome: "Democratized personal training experiences by enabling fast, AI-powered training plan creation at scale.",
     impact:
       "Reduced plan creation time 60 min → 20 min; increased Fitness Hub NPS 4.0 → 4.2; ensured great launch success in time for the 2024 tradeshows",
@@ -63,9 +63,9 @@ const PROJECT_ENTRIES: ProjectEntry[] = [
     showChat: true,
   },
   {
-    title: "Interhyp Home: New mortgage comparison product",
+    title: "Interhyp Home: New mortgage comparison overview",
     company: "interhyp",
-    defaultPrompt: "Tell me more about Alex's time at Interhyp (and EGYM respectively)",
+    defaultPrompt: "Tell me more about Alex's time at Interhyp (for Interhyp mortgage comparison).",
     outcome: "Modernized a core part of the interhyp platform (the mortgage comparison engine) to be used by both professional advisors and end customers.",
     impact:
       "Rolled out the new product to 10,000+ professional users, supporting the readiness for €10B+ annual volume through the platform.",

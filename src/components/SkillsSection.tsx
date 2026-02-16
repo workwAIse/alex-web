@@ -160,28 +160,20 @@ export default function SkillsSection() {
 
       {/* Logo marquee at bottom of section */}
       <MarqueeDemo />
-      {/* Logo.dev free tier: attribution required in production (public, followable). Do not add rel="noreferrer". Align with marquee strip (max-w-[90vw] mx-auto). */}
+      {/* Logo.dev free tier: attribution required in production (public, followable). Do not add rel="noreferrer". */}
       {typeof process !== "undefined" &&
         process.env.NEXT_PUBLIC_LOGO_DEV_PUBLISHABLE_KEY?.trim() && (
-          <div className="max-w-[90vw] mx-auto mt-4">
-            <p
-              className="text-right text-2xl"
-              style={{
-                color: "#b0aea5",
-                fontFamily: "var(--font-caveat), cursive",
-              }}
+          <p className="max-w-[90vw] mx-auto mt-3 text-right text-xs text-[#b0aea5] opacity-80">
+            Powered by{" "}
+            <a
+              href="https://logo.dev"
+              title="Logo API"
+              className="underline-offset-1 hover:underline hover:text-[#8a8880] transition-colors"
+              style={{ color: "inherit" }}
             >
-              🙏 to{" "}
-              <a
-                href="https://logo.dev"
-                title="Logo API"
-                className="underline-offset-2 hover:underline"
-                style={{ color: "#2563eb" }}
-              >
-                logo.dev
-              </a>
-            </p>
-          </div>
+              logo.dev
+            </a>
+          </p>
         )}
     </section>
   );
