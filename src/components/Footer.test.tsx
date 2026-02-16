@@ -33,12 +33,22 @@ describe("Footer", () => {
     expect(screen.getByText(/Leave me alone with my footer/i)).toBeDefined();
   });
 
-  it("renders copyright and Impressum link on the right", () => {
+  it("renders copyright and legal links (Impressum, Datenschutz, Haftungsausschluss) on the right", () => {
     render(<Footer />);
     expect(screen.getByText(/All rights reserved/i)).toBeDefined();
     const impressumLink = screen.getByRole("link", { name: /Impressum/i });
     expect(impressumLink).toBeDefined();
     expect(impressumLink.getAttribute("href")).toBe("/impressum");
+    const datenschutzLink = screen.getByRole("link", {
+      name: /Datenschutzerklärung/i,
+    });
+    expect(datenschutzLink).toBeDefined();
+    expect(datenschutzLink.getAttribute("href")).toBe("/datenschutz");
+    const haftungLink = screen.getByRole("link", {
+      name: /Haftungsausschluss/i,
+    });
+    expect(haftungLink).toBeDefined();
+    expect(haftungLink.getAttribute("href")).toBe("/haftungsausschluss");
   });
 
   it("renders current year in copyright", () => {

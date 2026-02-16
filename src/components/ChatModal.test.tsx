@@ -52,7 +52,7 @@ describe("ChatModal", () => {
     });
 
     render(<ChatModal {...defaultProps} />);
-    expect(screen.getByText("alexb-ai.vercel.app")).toBeDefined();
+    expect(screen.getByText("alex-buechel.com")).toBeDefined();
   });
 
   it("auto-sends the default prompt on mount when initialPrompt is not provided", () => {

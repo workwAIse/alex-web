@@ -34,18 +34,18 @@ export default function Footer() {
             </p>
           </div>
 
-          {/* Right: Dachshund with "Leave me alone" at bottom of image */}
+          {/* Right: Dachshund with "Leave me alone" inside image container. */}
           <div className="flex flex-col items-center justify-center md:items-end md:pl-4">
-            <div className="relative h-40 w-40 md:h-52 md:w-52">
+            <div className="relative h-[226px] w-[226px] md:h-[293px] md:w-[293px]">
               <Image
                 src="/dachshund-final.png"
                 alt="Dachshund enjoying a meal"
                 fill
                 className="object-contain object-center"
-                sizes="208px"
+                sizes="293px"
               />
               <p
-                className="absolute bottom-0 left-0 right-0 text-center text-sm italic opacity-90 md:text-right"
+                className="absolute bottom-[18%] left-0 right-0 text-center text-sm italic opacity-90 md:whitespace-nowrap md:text-right"
                 style={{
                   fontFamily: "var(--font-montserrat, inherit)",
                   textShadow: "0 1px 2px rgba(0,0,0,0.6)",
@@ -57,7 +57,7 @@ export default function Footer() {
           </div>
         </div>
 
-        {/* Bottom: Get in contact (left) | copyright + Impressum (right). Row 14px higher. */}
+        {/* Bottom: Get in contact (left) | copyright + legal links (right). Row 14px higher. */}
         <div className="-mt-[14px] flex flex-nowrap items-center justify-between gap-6 border-t border-white/10 pt-6">
           <a
             href={LINKEDIN_URL}
@@ -75,18 +75,24 @@ export default function Footer() {
             />
           </a>
           <span
-            className="flex shrink-0 items-center gap-4 text-xs opacity-70"
+            className="flex shrink-0 flex-wrap items-center justify-end gap-x-4 gap-y-1 text-xs opacity-70"
             style={{ fontFamily: "var(--font-montserrat, inherit)" }}
           >
             <span>© {new Date().getFullYear()}. All rights reserved.</span>
-            <span aria-hidden className="text-white/50">
-              ·
-            </span>
+            <span aria-hidden className="text-white/50">·</span>
+            <a href="/impressum" className="hover:underline hover:opacity-100">
+              Impressum
+            </a>
+            <span aria-hidden className="text-white/50">·</span>
+            <a href="/datenschutz" className="hover:underline hover:opacity-100">
+              Datenschutzerklärung
+            </a>
+            <span aria-hidden className="text-white/50">·</span>
             <a
-              href="/impressum"
+              href="/haftungsausschluss"
               className="hover:underline hover:opacity-100"
             >
-              Impressum
+              Haftungsausschluss
             </a>
           </span>
         </div>

@@ -289,7 +289,7 @@ export default function ChatModal({ jobTitle, onClose, initialPrompt }: ChatModa
 
             {/* Centered title */}
             <span className="flex-1 text-center text-xs font-medium text-black/50 select-none truncate">
-              alexb-ai.vercel.app
+              alex-buechel.com
             </span>
 
             {/* Spacer to balance traffic lights */}
@@ -376,41 +376,47 @@ export default function ChatModal({ jobTitle, onClose, initialPrompt }: ChatModa
           </div>
 
           {/* ── Input bar ── */}
-          <form
-            onSubmit={handleSubmit}
-            className="flex items-center gap-2 border-t border-black/10 bg-[#f5f5f5] px-4 py-3"
-          >
-            <input
-              ref={inputRef}
-              type="text"
-              value={input}
-              onChange={(e) => setInput(e.target.value)}
-              placeholder="Ask a follow-up..."
-              disabled={loading}
-              className="flex-1 rounded-lg bg-[#e8e8e8] px-4 py-2 text-sm text-black placeholder-black/40 outline-none ring-1 ring-black/10 focus:ring-black/25 disabled:opacity-50"
-            />
-            <button
-              type="submit"
-              disabled={loading || !input.trim()}
-              className="flex h-9 w-9 items-center justify-center rounded-lg bg-black text-white transition-opacity hover:opacity-90 disabled:opacity-30"
-              aria-label="Send message"
+          <div className="border-t border-black/10 bg-[#f5f5f5]">
+            <form
+              onSubmit={handleSubmit}
+              className="flex items-center gap-2 px-4 py-3"
             >
-              <svg
-                xmlns="http://www.w3.org/2000/svg"
-                width="16"
-                height="16"
-                viewBox="0 0 24 24"
-                fill="none"
-                stroke="currentColor"
-                strokeWidth="2"
-                strokeLinecap="round"
-                strokeLinejoin="round"
+              <input
+                ref={inputRef}
+                type="text"
+                value={input}
+                onChange={(e) => setInput(e.target.value)}
+                placeholder="Ask a follow-up..."
+                disabled={loading}
+                className="flex-1 rounded-lg bg-[#e8e8e8] px-4 py-2 text-sm text-black placeholder-black/40 outline-none ring-1 ring-black/10 focus:ring-black/25 disabled:opacity-50"
+              />
+              <button
+                type="submit"
+                disabled={loading || !input.trim()}
+                className="flex h-9 w-9 items-center justify-center rounded-lg bg-black text-white transition-opacity hover:opacity-90 disabled:opacity-30"
+                aria-label="Send message"
               >
-                <path d="M5 12h14" />
-                <path d="m12 5 7 7-7 7" />
-              </svg>
-            </button>
-          </form>
+                <svg
+                  xmlns="http://www.w3.org/2000/svg"
+                  width="16"
+                  height="16"
+                  viewBox="0 0 24 24"
+                  fill="none"
+                  stroke="currentColor"
+                  strokeWidth="2"
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                >
+                  <path d="M5 12h14" />
+                  <path d="m12 5 7 7-7 7" />
+                </svg>
+              </button>
+            </form>
+            <p className="pb-3 text-center text-[11px] text-black/50">
+              We don’t store your data but send it to OpenAI. AI can make
+              mistakes.
+            </p>
+          </div>
         </motion.div>
       </motion.div>
     </AnimatePresence>
