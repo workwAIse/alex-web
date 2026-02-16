@@ -6,6 +6,7 @@ import { motion } from "framer-motion";
 import Image from "next/image";
 import UnicornScene from "unicornstudio-react/next";
 import Header from "@/components/Header";
+import { useIsMobile } from "@/hooks/useMediaQuery";
 
 const UNICORN_PROJECT_ID = "i9BQoAQqkzcqJPHn60gG";
 const UNICORN_SDK_URL =
@@ -39,6 +40,7 @@ const LAPTOP_IMAGE_SRC = "/Laptop (1).png";
 type ZoomPhase = "idle" | "zooming" | "revealing" | "done";
 
 export default function Hero() {
+  const isMobile = useIsMobile();
   const [showScrollDown, setShowScrollDown] = useState(true);
   const [zoomPhase, setZoomPhase] = useState<ZoomPhase>("idle");
   const overlayRef = useRef<HTMLDivElement>(null);
@@ -62,9 +64,9 @@ export default function Hero() {
     return () => window.removeEventListener("wheel", handleWheel);
   }, [zoomPhase]);
 
-  /* In idle: intercept scroll-down at the top to start the zoom. */
+  /* In idle: intercept scroll-down at the top to start the zoom (desktop only). */
   useEffect(() => {
-    if (zoomPhase !== "idle") return;
+    if (zoomPhase !== "idle" || isMobile) return;
 
     const handleWheel = (e: WheelEvent) => {
       if (typeof window !== "undefined") {
@@ -79,7 +81,7 @@ export default function Hero() {
 
     window.addEventListener("wheel", handleWheel, { passive: false });
     return () => window.removeEventListener("wheel", handleWheel);
-  }, [zoomPhase]);
+  }, [zoomPhase, isMobile]);
 
   /* Reset to idle when user scrolls back into the hero area. */
   useEffect(() => {
@@ -140,8 +142,8 @@ export default function Hero() {
         aria-hidden
       />
 
-      {/* Full-screen overlay: laptop zoom + white blend + fade-out reveal */}
-      {isAnimating && (
+      {/* Full-screen overlay: laptop zoom + white blend + fade-out reveal (desktop only) */}
+      {!isMobile && isAnimating && (
         <motion.div
           ref={overlayRef}
           className="pointer-events-none fixed inset-0 z-20 flex items-center justify-center bg-black"

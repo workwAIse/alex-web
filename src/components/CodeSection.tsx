@@ -399,7 +399,7 @@ function BuiltView({ onViewSource }: { onViewSource: () => void }) {
   const galleryItems = useMemo(builtViewGalleryItems, []);
   return (
     <div
-      className="min-h-[480px] h-[520px] md:h-[600px] w-full flex flex-col overflow-hidden shadow-2xl border border-zinc-200 dark:border-zinc-700 bg-white dark:bg-zinc-900"
+      className="min-h-[360px] max-h-[85vh] w-full flex flex-col overflow-hidden shadow-2xl border border-zinc-200 dark:border-zinc-700 bg-white dark:bg-zinc-900 md:min-h-[480px] md:h-[520px] md:max-h-none lg:h-[600px]"
       style={{ backgroundColor: "#fff" }}
     >
       {/* Mac-like browser: same height as code view; in flow so you can scroll to other sections */}
