@@ -30,7 +30,7 @@ const PROJECT_ENTRIES: ProjectEntry[] = [
   {
     title: "EGYM Squat Test: AI Mobility Assessment",
     company: "egym",
-    defaultPrompt: "Tell Me More About Alex Time at EGYM",
+    defaultPrompt: "Tell me more about Alex's time at EGYM (and Interhyp respectively)",
     outcome: "Delivered a premium onboarding assessment and unlock actionable mobility insights using 3D body analysis.",
     impact: "Reduced flexibility test time 5 min → 20 sec; doubled flexibility test retention",
     tasks:
@@ -41,7 +41,7 @@ const PROJECT_ENTRIES: ProjectEntry[] = [
   {
     title: "Fitness Hub seca edition: Integrated BIA Assessments",
     company: "egym",
-    defaultPrompt: "Tell Me More About Alex Time at EGYM",
+    defaultPrompt: "Tell me more about Alex's time at EGYM (and Interhyp respectively)",
     outcome: "Launched a new product that combines best in class onboarding with medical-grade body composition analysis.",
     impact:
       "Successfully shipped a partner-integrated innovation product to global markets; enabled large-scale pilots and GTM execution with enterprise customers.",
@@ -53,7 +53,7 @@ const PROJECT_ENTRIES: ProjectEntry[] = [
   {
     title: "EGYM Genius: AI Training Plans",
     company: "egym",
-    defaultPrompt: "Tell Me More About Alex Time at EGYM",
+    defaultPrompt: "Tell me more about Alex's time at EGYM (and Interhyp respectively)",
     outcome: "Democratized personal training experiences by enabling fast, AI-powered training plan creation at scale.",
     impact:
       "Reduced plan creation time 60 min → 20 min; increased Fitness Hub NPS 4.0 → 4.2; ensured great launch success in time for the 2024 tradeshows",
@@ -65,7 +65,7 @@ const PROJECT_ENTRIES: ProjectEntry[] = [
   {
     title: "Interhyp Home: New mortgage comparison product",
     company: "interhyp",
-    defaultPrompt: "Tell Me More About Alex Time at Interhyp",
+    defaultPrompt: "Tell me more about Alex's time at Interhyp (and EGYM respectively)",
     outcome: "Modernized a core part of the interhyp platform (the mortgage comparison engine) to be used by both professional advisors and end customers.",
     impact:
       "Rolled out the new product to 10,000+ professional users, supporting the readiness for €10B+ annual volume through the platform.",
@@ -88,17 +88,22 @@ export default function ProjectsSection() {
         style={{ color: "#171717" }}
       >
         <div className="mx-auto max-w-3xl">
-          {/* Header: title */}
-          <header className="flex flex-wrap items-center justify-between gap-4">
-            <div className="flex items-center gap-3">
-              <FolderHeart
-                className="h-9 w-9 shrink-0 text-[#171717] md:h-12 md:w-12"
-                aria-hidden
-              />
-              <h2 className="text-4xl font-semibold tracking-tight text-[#171717] md:text-5xl">
-                Selected projects
-              </h2>
+          {/* Header: title + subheadline */}
+          <header className="flex flex-col gap-1">
+            <div className="flex flex-wrap items-center justify-between gap-4">
+              <div className="flex items-center gap-3">
+                <FolderHeart
+                  className="h-9 w-9 shrink-0 text-[#171717] md:h-12 md:w-12"
+                  aria-hidden
+                />
+                <h2 className="text-3xl font-semibold tracking-tight text-[#171717] md:text-4xl">
+                  Projects
+                </h2>
+              </div>
             </div>
+            <p className="text-base text-[#171717]/80">
+              Selected product initiatives I am proud of
+            </p>
           </header>
 
           {/* List: case studies with Goal, Role, Key work, Impact + chat bar */}

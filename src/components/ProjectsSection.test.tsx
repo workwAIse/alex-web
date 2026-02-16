@@ -15,7 +15,7 @@ describe("ProjectsSection", () => {
   it("renders Projects heading", () => {
     render(<ProjectsSection />);
     expect(
-      screen.getByRole("heading", { level: 2, name: /Selected projects/i })
+      screen.getByRole("heading", { level: 2, name: /^Projects$/ })
     ).toBeDefined();
   });
 
@@ -38,16 +38,17 @@ describe("ProjectsSection", () => {
   it("renders a chat input bar under each project with pre-filled prompt", () => {
     render(<ProjectsSection />);
     const inputs = screen.getAllByPlaceholderText("Ask a follow-up...");
-    expect(inputs.length).toBe(4);
+    // Only projects with showChat: true render a chat bar (EGYM Genius, Interhyp Home)
+    expect(inputs.length).toBe(2);
     const firstInput = inputs[0] as HTMLInputElement;
-    expect(firstInput.value).toBe("Tell Me More About Alex Time at EGYM");
-    const fourthInput = inputs[3] as HTMLInputElement;
-    expect(fourthInput.value).toBe("Tell Me More About Alex Time at Interhyp");
+    expect(firstInput.value).toBe("Tell me more about Alex's time at EGYM (and Interhyp respectively)");
+    const secondInput = inputs[1] as HTMLInputElement;
+    expect(secondInput.value).toBe("Tell me more about Alex's time at Interhyp (and EGYM respectively)");
   });
 
   it("renders company logos next to project headlines (EGYM and Interhyp)", () => {
     render(<ProjectsSection />);
     expect(screen.getAllByRole("img", { name: "EGYM" }).length).toBe(3);
-    expect(screen.getByRole("img", { name: "Interhyp" })).toBeDefined();
+    expect(screen.getByRole("img", { name: "Interhyp Gruppe" })).toBeDefined();
   });
 });

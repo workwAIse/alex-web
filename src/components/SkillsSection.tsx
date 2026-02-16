@@ -111,7 +111,7 @@ export default function SkillsSection() {
             </h2>
           </div>
           <p
-            className="text-base opacity-80 md:text-lg"
+            className="text-base opacity-80"
             style={{
               color: "#141413",
               fontFamily: "var(--font-lora), Georgia, serif",

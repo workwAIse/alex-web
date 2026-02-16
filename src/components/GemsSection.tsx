@@ -1,19 +1,22 @@
 "use client";
 
-import { useState, useRef, useEffect } from "react";
+import { useState, useRef, useEffect, useMemo } from "react";
 import {
   Activity,
   BookOpen,
   Code2,
+  Gem as GemIcon,
   MapPin,
   Mic,
   MoreVertical,
+  Pin,
   Search,
   Sparkles,
   Star,
   Users,
 } from "lucide-react";
 import type { LucideIcon } from "lucide-react";
+import { motion, LayoutGroup } from "framer-motion";
 import gemsData, { type Gem, type GemIconName } from "@/data/gems";
 
 /**
@@ -38,11 +41,13 @@ function GemCard({
   menuOpen,
   onMenuToggle,
   onMenuClose,
+  onPin,
 }: {
   gem: Gem;
   menuOpen: boolean;
   onMenuToggle: () => void;
   onMenuClose: () => void;
+  onPin?: () => void;
 }) {
   const IconComponent = ICON_MAP[gem.icon];
   const menuRef = useRef<HTMLDivElement>(null);
@@ -58,8 +63,15 @@ function GemCard({
     return () => document.removeEventListener("mousedown", handleClickOutside);
   }, [menuOpen, onMenuClose]);
 
+  const handlePin = () => {
+    onPin?.();
+    onMenuClose();
+  };
+
   return (
-    <article
+    <motion.article
+      layout
+      transition={{ type: "spring", stiffness: 350, damping: 30 }}
       className="relative min-h-[7.5rem] rounded-2xl border border-[#dadce0] bg-white p-5"
       style={{
         boxShadow:
@@ -105,7 +117,7 @@ function GemCard({
                   onClick={onMenuClose}
                 >
                   <Star className="h-4 w-4 shrink-0" strokeWidth={2} />
-                  Current favorite
+                  Favorite
                 </a>
               ) : (
                 <span
@@ -114,8 +126,20 @@ function GemCard({
                   role="menuitem"
                 >
                   <Star className="h-4 w-4 shrink-0" strokeWidth={2} />
-                  Current favorite
+                  Favorite
                 </span>
+              )}
+              {onPin && (
+                <button
+                  type="button"
+                  onClick={handlePin}
+                  className="flex w-full items-center gap-2 px-3 py-2 text-left text-[13px] transition-colors hover:bg-black/5"
+                  style={{ color: "#202124" }}
+                  role="menuitem"
+                >
+                  <Pin className="h-4 w-4 shrink-0" strokeWidth={2} />
+                  Pin
+                </button>
               )}
             </div>
           )}
@@ -133,12 +157,25 @@ function GemCard({
       >
         {gem.shortDescription}
       </p>
-    </article>
+    </motion.article>
   );
 }
 
 export default function GemsSection() {
   const [openMenuId, setOpenMenuId] = useState<string | null>(null);
+  /** Pinned gem ids in order: most recently pinned first. Not persisted — resets on reload. */
+  const [pinnedIds, setPinnedIds] = useState<string[]>([]);
+
+  const orderedGems = useMemo(() => {
+    const byId = new Map(gemsData.map((g) => [g.id, g]));
+    const pinned = pinnedIds.map((id) => byId.get(id)).filter(Boolean) as Gem[];
+    const rest = gemsData.filter((g) => !pinnedIds.includes(g.id));
+    return [...pinned, ...rest];
+  }, [pinnedIds]);
+
+  const handlePin = (gemId: string) => {
+    setPinnedIds((ids) => [gemId, ...ids.filter((id) => id !== gemId)]);
+  };
 
   return (
     <section
@@ -151,34 +188,44 @@ export default function GemsSection() {
       }}
     >
       <div className="mx-auto max-w-5xl">
-        <header>
-          <h2
-            className="text-[22px] font-normal tracking-tight md:text-[28px]"
-            style={{ color: "#202124", letterSpacing: "-0.02em" }}
-          >
-            Private Gems
-          </h2>
+        <header className="flex flex-col gap-1">
+          <div className="flex items-center gap-3">
+            <GemIcon
+              className="h-9 w-9 shrink-0 text-[#202124] md:h-10 md:w-10"
+              strokeWidth={1.5}
+              aria-hidden
+            />
+            <h2
+              className="text-3xl font-normal tracking-tight md:text-4xl"
+              style={{ color: "#202124", letterSpacing: "-0.02em" }}
+            >
+              Private Gems
+            </h2>
+          </div>
           <p
-            className="mt-0.5 text-[14px] font-normal"
+            className="text-base font-normal"
             style={{ color: "#5f6368" }}
           >
             Learn a bit about me besides (and maybe within) work
           </p>
         </header>
 
-        <div className="mt-8 grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
-          {gemsData.map((gem) => (
-            <GemCard
-              key={gem.id}
-              gem={gem}
-              menuOpen={openMenuId === gem.id}
-              onMenuToggle={() =>
-                setOpenMenuId((id) => (id === gem.id ? null : gem.id))
-              }
-              onMenuClose={() => setOpenMenuId(null)}
-            />
-          ))}
-        </div>
+        <LayoutGroup>
+          <div className="mt-8 grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
+            {orderedGems.map((gem) => (
+              <GemCard
+                key={gem.id}
+                gem={gem}
+                menuOpen={openMenuId === gem.id}
+                onMenuToggle={() =>
+                  setOpenMenuId((id) => (id === gem.id ? null : gem.id))
+                }
+                onMenuClose={() => setOpenMenuId(null)}
+                onPin={() => handlePin(gem.id)}
+              />
+            ))}
+          </div>
+        </LayoutGroup>
       </div>
     </section>
   );

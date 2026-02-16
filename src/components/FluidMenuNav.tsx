@@ -3,10 +3,10 @@
 import { MenuContainer, MenuItem } from "@/components/ui/fluid-menu";
 import {
   VenetianMask,
-  BriefcaseBusiness,
-  PocketKnife,
-  Compass,
-  Balloon,
+  FolderHeart,
+  LampDesk,
+  Code2,
+  Gem,
 } from "lucide-react";
 import { useEffect, useRef, useState } from "react";
 import Lottie, { type LottieRef } from "lottie-react";
@@ -19,12 +19,12 @@ const NAV_ITEMS = [
   { label: "Home", icon: <VenetianMask size={NAV_ICON_SIZE} strokeWidth={1.5} />, href: "/" },
   {
     label: "Selected projects",
-    icon: <BriefcaseBusiness size={NAV_ICON_SIZE} strokeWidth={1.5} />,
+    icon: <FolderHeart size={NAV_ICON_SIZE} strokeWidth={1.5} />,
     href: "/#projects",
   },
-  { label: "Skills", icon: <PocketKnife size={NAV_ICON_SIZE} strokeWidth={1.5} />, href: "/#skills" },
-  { label: "Code", icon: <Compass size={NAV_ICON_SIZE} strokeWidth={1.5} />, href: "/#code" },
-  { label: "Gems", icon: <Balloon size={NAV_ICON_SIZE} strokeWidth={1.5} />, href: "/#gems" },
+  { label: "Skills", icon: <LampDesk size={NAV_ICON_SIZE} strokeWidth={1.5} />, href: "/#skills" },
+  { label: "Code", icon: <Code2 size={NAV_ICON_SIZE} strokeWidth={1.5} />, href: "/#code" },
+  { label: "Gems", icon: <Gem size={NAV_ICON_SIZE} strokeWidth={1.5} />, href: "/#gems" },
   { label: "Contact", href: "/#gems" },
 ];
 

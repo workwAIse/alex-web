@@ -30,7 +30,8 @@ describe("Footer", () => {
     render(<Footer />);
     const img = screen.getByRole("img", { name: /Dachshund enjoying a meal/i });
     expect(img).toBeDefined();
-    expect(screen.getByText(/Leave me alone with my footer/i)).toBeDefined();
+    const captions = screen.getAllByText(/Leave me alone with my footer/i);
+    expect(captions.length).toBeGreaterThanOrEqual(1);
   });
 
   it("renders copyright and legal links (Impressum, Datenschutz, Haftungsausschluss) on the right", () => {
